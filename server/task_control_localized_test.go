@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // Regression tests that keep the error responses of task_control.go's task/intent

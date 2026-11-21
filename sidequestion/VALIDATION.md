@@ -1,10 +1,6 @@
 # `/btw` Validation Record
 
-English · [中文](VALIDATION.zh.md)
-
 Date: 2026-09-10. Branch: `codex/btw-side-question`. Baseline commit: `8dae851b9b622f2ff2631f332fde9719d0b16fba`.
-
-> This document is an English translation of the original Chinese document (`VALIDATION.zh.md`). The original is kept unchanged so upstream changes are easy to compare.
 
 An isolated PostgreSQL test DB and data directory were used. Real model credentials were injected only into the isolated test environment and never written to code or this record, and the product's default model was not changed. Go 1.26.3, norma v0.3.6, Next.js 16.2.9.
 
@@ -82,7 +78,7 @@ The controllable fixture was used to verify concurrency timing precisely and doe
 - Follow-up after actually stopping and restarting the Go service: the previous 3 side-question records were kept, and the asset, marker and title were answered directly from the persisted snapshot without re-running the main agent.
 - Grok non-streaming config used in a new session: correctly answered the asset and `ATOMIC-0910`, and returned and saved usage (input 11734, output 138, cache_read 11520).
 
-In the asset case the main session read the public home page with WebFetch and Bash/curl; the landing page was `https://id.redhaze.top/home`, and the title returned by the page was "红幕科技 RedHaze Group · 全球综合集团门户" (quoted verbatim as returned by the model). Bash only saved the response to a local test file temporarily and performed no remote writes. This was confirmed separately from the fact that "the side question did not execute tools".
+In the asset case the main session read the public home page with WebFetch and Bash/curl; the landing page was `https://id.redhaze.top/home`, and the title returned by the page was a Chinese title reading "RedHaze Technology RedHaze Group · Global Group Portal" (returned verbatim by the model). Bash only saved the response to a local test file temporarily and performed no remote writes. This was confirmed separately from the fact that "the side question did not execute tools".
 
 Main transcript checksum: `e7e61f135a4a120954b539f357e8c4205d7d5cd7460dcaf3dc0fd066463e1d00`.
 

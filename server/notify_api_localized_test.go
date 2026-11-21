@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // Regression guard that keeps the notification-settings API responses and test

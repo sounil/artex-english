@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // Regression tests that keep the validation error responses returned via writeErr by

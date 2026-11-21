@@ -3192,9 +3192,11 @@
       "enabledOn": "Update checks are on",
       "enabledOff": "Update checks are off",
       "source": "Updates come from <code>{repo}</code> on GitHub.",
+      "sourceNone": "No update source is configured, so checking for and installing updates is unavailable. Enter one below or set <code>{env}</code>.",
+      "sourcePrecaution": "Earlier versions of this code pointed to <code>Autumn-27/ARTEX</code> and <code>jiwoochris/artex-global</code>. Those repositories are outside this project's control, so take precautions before using either of them as an update source.",
       "disabledNote": "While update checks are off, ARTEX never contacts GitHub, and checking for or installing updates is unavailable.",
       "sourceLabel": "Update source",
-      "sourceHelp": "GitHub repository in owner/name form. Leave empty to use <code>{env}</code>, or <code>{default}</code> if that is not set.",
+      "sourceHelp": "GitHub repository in owner/name form. Leave empty to use <code>{env}</code>; if that is not set either, updates are unavailable.",
       "sourceSave": "Save",
       "currentVersion": "Current version",
       "latestVersion": "Latest version",
@@ -3235,11 +3237,6 @@
         "docker": "Note: updating inside the container replaces only the program itself and does not update the image's tool chain such as playwright / nmap. If the new version depends on new tools, switch to running it with docker compose pull.",
         "rollback": "Roll back to the previous version?\n\nThe program will restart and running tasks will be interrupted.\nNote: the database structure is not rolled back, and the previous version may not recognize data written by the new version."
       }
-    },
-    "language": {
-      "title": "Display language",
-      "desc": "The language of on-screen text and of the reports, summaries and chat replies the agents write. It takes effect immediately with no need to save. The on-screen language is stored in this browser only, so you will need to pick it again if you switch browsers or clear site data. The agent output language is stored on the server and applies from any browser.",
-      "label": "Language"
     }
   },
   "llmPage": {

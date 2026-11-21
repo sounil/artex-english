@@ -81,29 +81,20 @@ func TestRenderSystemOverrideAndFallback(t *testing.T) {
 	}
 }
 
-// langMarker is the unambiguous substring that proves langDirective selected a
-// given display language. These are the native-script tokens embedded in the
-// directive, so finding one means the output-language mandate names that
+// langMarker is the substring that proves langDirective names the output
 // language. Used by the directive and role-append tests below.
 var langMarker = map[string]string{
-	"ko": "한국어",
 	"en": "English",
-	"zh": "简体中文",
-	"es": "Español",
-	"ja": "日本語",
 }
 
-// TestLangDirectiveLocalized pins the output-language tail across all
-// four display languages: each language's directive names that language, preserves
-// raw technical strings, forbids mirroring the target/material language, and names
-// the planner situation summary. For every non-Chinese display language the "never
-// emit Chinese to the user" clause is present; for Chinese it is absent (Chinese
-// output is the goal there).
+// TestLangDirectiveLocalized pins the English output-language tail: it names English,
+// preserves raw technical strings, forbids mirroring the target/material language,
+// names the planner situation summary, and forbids leaking Chinese to the user.
 func TestLangDirectiveLocalized(t *testing.T) {
-	for _, code := range SupportedOutputLangs {
+	for _, code := range []string{outputLang} {
 		dir := langDirective(code)
 		if !strings.Contains(dir, langMarker[code]) {
-			t.Fatalf("%s: langDirective must name the display language (%q), got %q", code, langMarker[code], dir)
+			t.Fatalf("%s: langDirective must name the output language (%q), got %q", code, langMarker[code], dir)
 		}
 		if !strings.Contains(dir, "payload") || !strings.Contains(dir, "kept verbatim") {
 			t.Fatalf("%s: langDirective must keep commands/payloads verbatim, got %q", code, dir)
@@ -114,14 +105,8 @@ func TestLangDirectiveLocalized(t *testing.T) {
 		if !strings.Contains(dir, "situation summary") {
 			t.Fatalf("%s: langDirective must name the planner situation summary as user-facing, got %q", code, dir)
 		}
-		// The anti-Chinese-leak clause applies to every non-Chinese display
-		// language (planner situation-summary drift). When the display language IS
-		// Chinese, Chinese output is correct, so the clause must be absent.
-		hasNoZhClause := strings.Contains(dir, "never output Chinese to the user")
-		if code == "zh" && hasNoZhClause {
-			t.Fatalf("zh: directive must NOT forbid Chinese output when the display language is Chinese, got %q", dir)
-		}
-		if code != "zh" && !hasNoZhClause {
+		// The anti-Chinese-leak clause guards against planner situation-summary drift.
+		if !strings.Contains(dir, "never output Chinese to the user") {
 			t.Fatalf("%s: langDirective must forbid leaking Chinese to the user, got %q", code, dir)
 		}
 	}
@@ -129,19 +114,16 @@ func TestLangDirectiveLocalized(t *testing.T) {
 
 // TestLangDirectiveAppendedToUserFacingRoles pins the localization tail wiring:
 // every user-facing role's system prompt must end with the code-owned
-// output-language directive in the configured language, and a DB-edited body must
-// NOT be able to drop it. Exercised for each supported display language by driving
-// the OutputLanguage hook the roles resolve through.
+// English output-language directive, and a DB-edited body must NOT be able to drop it.
 func TestLangDirectiveAppendedToUserFacingRoles(t *testing.T) {
-	t.Cleanup(func() { PromptOverride = nil; OutputLanguage = nil })
+	t.Cleanup(func() { PromptOverride = nil })
 
 	// Even with a DB body that is pure non-directive text, the code-owned tail is
 	// still appended for each user-facing builder — identical guarantee to the
 	// artifact tail. A custom body can never translate away the output-language mandate.
 	PromptOverride = func(string) (string, bool) { return "BODY-ONLY", true }
 
-	for _, code := range SupportedOutputLangs {
-		OutputLanguage = func() string { return code }
+	for _, code := range []string{outputLang} {
 		marker := langMarker[code]
 		cases := map[string]string{
 			"worker":    workerSystem("", "", "/data", "/data"),

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 func bigMsg(role llm.Role, n int) llm.Message {

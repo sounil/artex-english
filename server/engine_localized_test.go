@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // Regression tests that keep the "user-facing" messages among engine.go's task control

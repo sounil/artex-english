@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // Regression test that keeps the transport-config validation errors returned by

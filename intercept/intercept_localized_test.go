@@ -5,8 +5,6 @@ import (
 	"strings"
 	"testing"
 	"unicode"
-
-	"github.com/Autumn-27/artex/config"
 )
 
 // hasCJK reports whether s contains any Hangul, Han or kana character.
@@ -41,14 +39,6 @@ func assertEnglish(t *testing.T, label, s string) {
 	}
 }
 
-// withLanguage pins config.ActiveLanguage for the duration of a test.
-func withLanguage(t *testing.T, lang string) {
-	t.Helper()
-	prev := config.CurrentLanguage
-	config.CurrentLanguage = func() string { return lang }
-	t.Cleanup(func() { config.CurrentLanguage = prev })
-}
-
 // TestInterceptMessagesEnglish pins the user-facing judge/approval source messages
 // to English. These surface in the approval record reason, the activity stream, and
 // the 409 response for an already-decided request.
@@ -68,23 +58,14 @@ func TestInterceptMessagesEnglish(t *testing.T) {
 	}
 }
 
-// TestJudgeActionLabelLocalized checks the three judge verdict labels follow the
-// active language (English by default, Korean 허용 / 차단 / 확인 요청 when ko is
-// selected) and that an unknown action still passes through untranslated.
+// TestJudgeActionLabelLocalized checks the three judge verdict labels are English
+// and that an unknown action still passes through unchanged.
 func TestJudgeActionLabelLocalized(t *testing.T) {
-	withLanguage(t, "en")
 	for _, action := range []string{"allow", "deny", "ask"} {
 		assertEnglish(t, "judgeActionLabel("+action+")", judgeActionLabel(action))
 	}
 	if got := judgeActionLabel("weird"); got != "weird" {
 		t.Errorf("judgeActionLabel(weird) = %q, want passthrough", got)
-	}
-	withLanguage(t, "ko")
-	want := map[string]string{"allow": "허용", "deny": "차단", "ask": "확인 요청"}
-	for action, w := range want {
-		if got := judgeActionLabel(action); got != w {
-			t.Errorf("ko judgeActionLabel(%s) = %q, want %q", action, got, w)
-		}
 	}
 }
 

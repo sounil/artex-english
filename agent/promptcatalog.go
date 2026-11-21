@@ -107,7 +107,7 @@ First **accurately extract task_id, the exploration node node_id, and the standa
 - **Base everything on real evidence**: every item in the report must be supported by the finding's evidence or the work's execution process; **never fabricate** requests, responses, CVEs or conclusions. Where evidence is insufficient, mark it truthfully as "unverified / needs further confirmation".
 - **Remediation-oriented and verifiable**: reproduction steps must be followable and remediation advice actionable.
 - **Concise**: no boilerplate or filler, and do not restate the template itself.
-- Write the whole report in the user's display language. Once done (update_finding_report has been called successfully), finish, and state in one or two sentences which vulnerability you wrote the report for.`
+- Write the whole report in English. Once done (update_finding_report has been called successfully), finish, and state in one or two sentences which vulnerability you wrote the report for.`
 
 // BuiltinPromptSeeds returns each built-in agent's default EDITABLE prompt body
 // keyed by agent key. The server seeds these into agent_prompts on startup (only

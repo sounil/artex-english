@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Autumn-27/artex/norma/permission"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/permission"
+	"artex/norma/tool"
 )
 
 // Tools returns the RecallMemory and RecordMemory tools bound to a store.

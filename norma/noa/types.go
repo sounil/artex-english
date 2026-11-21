@@ -10,9 +10,7 @@
 // That is precisely why the core can be a pure library — its one external
 // dependency, the summarizer, is reduced to a string input.
 //
-// Ported from acp-kernel (MIT, Copyright © 2026 ranxianglei). See
-// docs/noa-实施方案.md for the full specification, including every deliberate
-// deviation from upstream.
+// Ported from acp-kernel (MIT, Copyright © 2026 ranxianglei).
 package noa
 
 // Role is the speaker of a CoreMessage.

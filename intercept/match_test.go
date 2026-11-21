@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 	_ "github.com/jackc/pgx/v5/stdlib" // registers the "pgx" driver used below
 )
 

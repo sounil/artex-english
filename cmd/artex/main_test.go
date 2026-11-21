@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/agent"
+	"artex/agent"
 )
 
 func TestShutdownContextPreservesNamedCause(t *testing.T) {

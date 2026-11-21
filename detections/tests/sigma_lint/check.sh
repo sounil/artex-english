@@ -9,7 +9,7 @@
 #                           baseline reports 0 errors and 0 issues.
 #   2. the full set is live  running ALL SigmaHQ validators (no exclusions) still
 #                           reports issues, and every issue type is one of the
-#                           four documented, excluded categories — nothing else.
+#                           three documented, excluded categories — nothing else.
 #
 # Property 2 is the anti-vacuity guard. If the validator plugin failed to load,
 # the "all" run would report zero issues and property 1 would pass vacuously;
@@ -28,9 +28,9 @@ SIGMAHQ_VALIDATORS_VERSION="${SIGMAHQ_VALIDATORS_VERSION:-0.21.0}"
 pip install --quiet --disable-pip-version-check \
   "sigma-cli==${VERSION}" "pySigma-validators-sigmahq==${SIGMAHQ_VALIDATORS_VERSION}" >/dev/null 2>&1
 
-# The four issue types the documented baseline (validators.yml) intentionally
+# The three issue types the documented baseline (validators.yml) intentionally
 # excludes. Any issue outside this set must fail the build.
-ALLOWED='SigmahqGithubLinkIssue SigmahqFilenamePrefixIssue SigmahqCorrelationFilenamePrefixIssue SigmahqLogsourceUnknownIssue'
+ALLOWED='SigmahqFilenamePrefixIssue SigmahqCorrelationFilenamePrefixIssue SigmahqLogsourceUnknownIssue'
 
 printf 'validators:\n  - all\n' > /tmp/all.yml
 
@@ -57,7 +57,7 @@ if [ -z "$types" ]; then
   bad  "the full validator set reported no SigmaHQ issues at all — the plugin did not load (vacuous)"
 else
   # Anti-vacuity: the two load-bearing exclusions must actually appear.
-  for must in SigmahqGithubLinkIssue SigmahqLogsourceUnknownIssue; do
+  for must in SigmahqFilenamePrefixIssue SigmahqLogsourceUnknownIssue; do
     if printf '%s\n' "$types" | grep -qx "$must"; then
       pass "full set is live: $must present"
     else
@@ -72,7 +72,7 @@ else
       *) bad "undocumented convention issue from the full set: $t"; unexpected=1 ;;
     esac
   done
-  [ "$unexpected" -eq 0 ] && pass "every reported issue is one of the four documented exclusions"
+  [ "$unexpected" -eq 0 ] && pass "every reported issue is one of the three documented exclusions"
 fi
 
 echo

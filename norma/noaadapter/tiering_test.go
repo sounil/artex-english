@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/noa"
+	"artex/norma/noa"
 )
 
 // Multi-tier compression is what keeps summaries from accumulating without

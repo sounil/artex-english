@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // fakeProv is a scripted provider: script[i] is what the i-th call yields —

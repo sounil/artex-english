@@ -10,14 +10,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/norma/agentcore"
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/permission"
-	actool "github.com/Autumn-27/artex/norma/tool"
-	"github.com/Autumn-27/artex/norma/transcript"
+	"artex/db"
+	"artex/intercept"
+	"artex/norma/agentcore"
+	"artex/norma/harness"
+	"artex/norma/llm"
+	"artex/norma/permission"
+	actool "artex/norma/tool"
+	"artex/norma/transcript"
 )
 
 // Worker is an LLM work agent (docs §4.4): it claims ONE intent, completes it

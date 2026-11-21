@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/Autumn-27/artex/norma/noa"
+	"artex/norma/noa"
 )
 
 // fileArchiver writes archives under <root>/tier<N>/.

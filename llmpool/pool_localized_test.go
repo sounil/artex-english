@@ -7,7 +7,7 @@ import (
 	"testing"
 	"unicode"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // hasCJK reports whether s contains any Hangul, Han or kana character.

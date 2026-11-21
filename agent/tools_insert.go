@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Autumn-27/artex/db"
-	actool "github.com/Autumn-27/artex/norma/tool"
+	"artex/db"
+	actool "artex/norma/tool"
 )
 
 // assetInterceptCandidates extracts the domain/IP/URL candidate strings of one asset input item, for asset-intercept matching.

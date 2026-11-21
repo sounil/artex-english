@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // Summary generation constants (== claude-code).

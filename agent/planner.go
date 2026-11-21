@@ -7,13 +7,13 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/norma/agentcore"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/permission"
-	actool "github.com/Autumn-27/artex/norma/tool"
-	"github.com/Autumn-27/artex/norma/transcript"
+	"artex/db"
+	"artex/intercept"
+	"artex/norma/agentcore"
+	"artex/norma/llm"
+	"artex/norma/permission"
+	actool "artex/norma/tool"
+	"artex/norma/transcript"
 )
 
 // Planner is the event-driven LLM planner (docs §4.3): each time the asset or

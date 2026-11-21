@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 type roundTripperFunc func(*http.Request) (*http.Response, error)

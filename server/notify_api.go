@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/notify"
+	"artex/db"
+	"artex/notify"
 )
 
 // HTTP endpoints of the push notification feature. All routes sit behind requireAuth (see Handler()),

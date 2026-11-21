@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Autumn-27/artex/norma/noa"
+	"artex/norma/noa"
 )
 
 // DeadRangeTracker breaks the loop where a model keeps asking to compress refs

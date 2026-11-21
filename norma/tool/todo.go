@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Autumn-27/artex/norma/permission"
+	"artex/norma/permission"
 )
 
 // TodoStatus is the state of a todo item.

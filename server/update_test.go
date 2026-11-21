@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Autumn-27/artex/selfupdate"
+	"artex/selfupdate"
 )
 
 // releaseCache is the layer that protects the GitHub quota: the unauthenticated API
@@ -263,9 +263,9 @@ func TestUpdateEndpointsRequireOptIn(t *testing.T) {
 		return v
 	}
 
-	// Off by default: even force=1 stays local, and apply is refused.
-	if v := check("force=1"); v.Enabled || v.Latest != "" || v.Repo != selfupdate.DefaultRepo {
-		t.Fatalf("default check = %+v; want disabled, no release, repo %s", v, selfupdate.DefaultRepo)
+	// Off by default and no source configured: even force=1 stays local, and apply is refused.
+	if v := check("force=1"); v.Enabled || v.Latest != "" || v.Repo != "" || v.Source != selfupdate.RepoNotSet || v.Error != "" {
+		t.Fatalf("default check = %+v; want disabled, no source, no release, no error", v)
 	}
 	if rec := do("POST", "/api/update/apply", nil); rec.Code != 403 {
 		t.Fatalf("apply while off: status %d, want 403", rec.Code)
@@ -274,9 +274,20 @@ func TestUpdateEndpointsRequireOptIn(t *testing.T) {
 		t.Fatalf("GitHub fetched %d times while update checks were off", calls)
 	}
 
-	// On: cached=1 still never fetches; force=1 does, once.
+	// On but no source configured: nothing is fetched and installing is refused.
 	if rec := do("PUT", "/api/settings", map[string]any{"update_check_enabled": true}); rec.Code != 200 {
 		t.Fatalf("enable: status %d %s", rec.Code, rec.Body.String())
+	}
+	if v := check("force=1"); !v.Enabled || v.Latest != "" || v.Repo != "" || calls != 0 {
+		t.Fatalf("check without a source = %+v (calls %d); want nothing fetched", v, calls)
+	}
+	if rec := do("POST", "/api/update/apply", nil); rec.Code != 400 {
+		t.Fatalf("apply without a source: status %d, want 400", rec.Code)
+	}
+
+	// With a source: cached=1 still never fetches; force=1 does, once.
+	if rec := do("PUT", "/api/settings", map[string]any{"update_repo": "owner/repo"}); rec.Code != 200 {
+		t.Fatalf("set source: status %d %s", rec.Code, rec.Body.String())
 	}
 	if v := check("cached=1"); !v.Enabled || v.Latest != "" || calls != 0 {
 		t.Fatalf("cached check before any explicit check = %+v (calls %d); want enabled, nothing fetched", v, calls)
@@ -295,11 +306,14 @@ func TestUpdateEndpointsRequireOptIn(t *testing.T) {
 	if v := check("cached=1"); v.Enabled || v.Latest != "" {
 		t.Fatalf("check after disabling = %+v; want disabled with no release", v)
 	}
-	if _, _, ok := relCache.peek(selfupdate.DefaultRepo); ok {
+	if _, _, ok := relCache.peek("owner/repo"); ok {
 		t.Fatal("disabling must clear the cached release")
 	}
 
 	// The Settings field: saved values are validated, beat the environment, and can be cleared.
+	if rec := do("PUT", "/api/settings", map[string]any{"update_repo": ""}); rec.Code != 200 {
+		t.Fatalf("clear update_repo: status %d", rec.Code)
+	}
 	t.Setenv(selfupdate.RepoEnv, "env/choice")
 	if v := check("cached=1"); v.Repo != "env/choice" || v.Source != selfupdate.RepoFromEnv {
 		t.Fatalf("env source = %+v", v)
@@ -317,11 +331,11 @@ func TestUpdateEndpointsRequireOptIn(t *testing.T) {
 		t.Fatalf("clear update_repo: status %d", rec.Code)
 	}
 	t.Setenv(selfupdate.RepoEnv, "")
-	if v := check("cached=1"); v.Repo != selfupdate.DefaultRepo || v.Source != selfupdate.RepoFromDefault {
-		t.Fatalf("cleared source = %+v; want the default", v)
+	if v := check("cached=1"); v.Repo != "" || v.Source != selfupdate.RepoNotSet {
+		t.Fatalf("cleared source = %+v; want no source", v)
 	}
 
-	// An invalid source is reported and blocks the check instead of falling back to the default.
+	// An invalid source is reported and blocks the check; there is nothing to fall back to.
 	t.Setenv(selfupdate.RepoEnv, "not a repo")
 	if v := check("force=1"); v.Error == "" || calls != 1 {
 		t.Fatalf("invalid repo check = %+v (calls %d); want an error and no fetch", v, calls)

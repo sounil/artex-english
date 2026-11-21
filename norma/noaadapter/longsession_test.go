@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/noa"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/llm"
+	"artex/norma/noa"
+	"artex/norma/tool"
 )
 
 // simAgent drives a scripted conversation through noa the way a real agent
@@ -320,7 +320,7 @@ func TestLongSessionArchivesRemainComplete(t *testing.T) {
 			}
 		} else {
 			// A higher tier holds the summaries it absorbed, each pointing on.
-			if !strings.Contains(body, "绝对路径") {
+			if !strings.Contains(body, "Absolute path") {
 				t.Fatalf("block %s: tier-%d archive names no child archive:\n%s", b.BlockID, b.Tier, head(body, 400))
 			}
 		}

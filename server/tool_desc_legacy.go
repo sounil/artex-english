@@ -3,8 +3,8 @@ package server
 import (
 	"log"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/traffic"
+	"artex/agent"
+	"artex/traffic"
 )
 
 // legacyToolDescriptions holds the original Chinese descriptions of the built-in

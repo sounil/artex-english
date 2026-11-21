@@ -561,7 +561,7 @@ func (s *Server) authInit(w http.ResponseWriter, r *http.Request) {
 	// request may set it first while bcrypt spends tens of ms, and the read check can be defeated by an outage.
 	inserted, err := pg.InsertSettingIfAbsent(authPassKey, string(hash))
 	if err != nil {
-		writeErr(w, 500, trMsg(authErrSaveFailedPrefix)+err.Error())
+		writeErr(w, 500, authErrSaveFailedPrefix+err.Error())
 		return
 	}
 	if !inserted {
@@ -640,7 +640,7 @@ func (s *Server) authChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := pg.SetSetting(authPassKey, string(newHash)); err != nil {
-		writeErr(w, 500, trMsg(authErrSaveFailedPrefix)+err.Error())
+		writeErr(w, 500, authErrSaveFailedPrefix+err.Error())
 		return
 	}
 	s.setPassHash(string(newHash))

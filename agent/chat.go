@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/guard"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/norma/agentcore"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/permission"
-	actool "github.com/Autumn-27/artex/norma/tool"
-	"github.com/Autumn-27/artex/norma/transcript"
+	"artex/db"
+	"artex/guard"
+	"artex/intercept"
+	"artex/norma/agentcore"
+	"artex/norma/llm"
+	"artex/norma/permission"
+	actool "artex/norma/tool"
+	"artex/norma/transcript"
 )
 
 // ChatAgent is the generic, task-independent conversational runner behind the chat

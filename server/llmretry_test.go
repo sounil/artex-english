@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
+	"artex/agent"
+	"artex/db"
 )
 
 // With nothing configured the resolved result must be all zero — i.e. the SDK's and

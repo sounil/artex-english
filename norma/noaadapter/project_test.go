@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/noa"
+	"artex/norma/llm"
+	"artex/norma/noa"
 )
 
 func userText(s string) llm.Message {

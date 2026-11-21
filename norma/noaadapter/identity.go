@@ -1,8 +1,6 @@
 // Package noaadapter wires the pure noa engine into Norma: it projects
 // llm.Message into noa's flat representation and back, persists state and
 // archives, and exposes the Compress tool.
-//
-// See docs/noa-实施方案.md for the specification.
 package noaadapter
 
 import (
@@ -10,7 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/Autumn-27/artex/norma/noa"
+	"artex/norma/noa"
 )
 
 // DeriveMessageID computes a message's stable identity.

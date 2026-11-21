@@ -460,9 +460,9 @@ func TestSettleIsNoopWithoutMarker(t *testing.T) {
 
 func TestValidateRepo(t *testing.T) {
 	good := map[string]string{
-		"sounil/artex-english":    "sounil/artex-english",
-		" owner/repo.name_2 ":     "owner/repo.name_2",
-		"jiwoochris/artex-global": "jiwoochris/artex-global",
+		"owner/artex-fork":    "owner/artex-fork",
+		" owner/repo.name_2 ": "owner/repo.name_2",
+		"Owner-2/Repo-3":      "Owner-2/Repo-3",
 	}
 	for in, want := range good {
 		got, err := ValidateRepo(in)
@@ -487,7 +487,7 @@ func TestResolveRepoPrecedence(t *testing.T) {
 		name, setting, env, wantRepo, wantSource string
 		wantErr                                  bool
 	}{
-		{name: "default", wantRepo: DefaultRepo, wantSource: RepoFromDefault},
+		{name: "no source configured", wantSource: RepoNotSet, wantErr: true},
 		{name: "env", env: "someone/fork", wantRepo: "someone/fork", wantSource: RepoFromEnv},
 		{name: "settings beats env", setting: "ui/choice", env: "someone/fork", wantRepo: "ui/choice", wantSource: RepoFromSettings},
 		{name: "blank setting falls through", setting: "   ", env: "someone/fork", wantRepo: "someone/fork", wantSource: RepoFromEnv},

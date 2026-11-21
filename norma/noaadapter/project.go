@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/noa"
+	"artex/norma/llm"
+	"artex/norma/noa"
 )
 
 // origin records where a projected core came from, so reassembly can put it

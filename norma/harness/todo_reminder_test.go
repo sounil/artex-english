@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/llm"
+	"artex/norma/tool"
 )
 
 func asst(text string) llm.Message {

@@ -8,10 +8,10 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
-	actool "github.com/Autumn-27/artex/norma/tool"
-	"github.com/Autumn-27/artex/traffic"
+	"artex/agent"
+	"artex/db"
+	actool "artex/norma/tool"
+	"artex/traffic"
 )
 
 // Agent-facing strings: everything in this file feeds the agent and never goes out as an

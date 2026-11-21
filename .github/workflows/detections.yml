@@ -37,7 +37,6 @@ on:
       - "traffic/traffic.go"
       # The two files read by the third gate (defense template consistency check). If this template changes
       # it must be revalidated, so they are included in the trigger.
-      - "docs/defense-ko.md"
       - "docs/defense-en.md"
       - ".github/workflows/detections.yml"
   pull_request:
@@ -51,7 +50,6 @@ on:
       - "db/schema.sql"
       - "cmd/artex/main.go"
       - "traffic/traffic.go"
-      - "docs/defense-ko.md"
       - "docs/defense-en.md"
       - ".github/workflows/detections.yml"
 

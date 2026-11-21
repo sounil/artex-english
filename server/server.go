@@ -17,22 +17,19 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/config"
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/llmpool"
-	"github.com/Autumn-27/artex/llmrec"
-	"github.com/Autumn-27/artex/norma/llm"
-	actool "github.com/Autumn-27/artex/norma/tool"
-	"github.com/Autumn-27/artex/norma/transcript"
-	"github.com/Autumn-27/artex/notify"
-	"github.com/Autumn-27/artex/report"
-	"github.com/Autumn-27/artex/selfupdate"
-	"github.com/Autumn-27/artex/traffic"
+	"artex/agent"
+	"artex/db"
+	"artex/intercept"
+	"artex/llmpool"
+	"artex/llmrec"
+	"artex/norma/llm"
+	actool "artex/norma/tool"
+	"artex/norma/transcript"
+	"artex/report"
+	"artex/selfupdate"
+	"artex/traffic"
 )
 
 // BuildVersion is the backend application version, injected from cmd/artex at
@@ -74,7 +71,6 @@ const (
 	errNotifyDigestRange   = "The summary interval must be between 1 and 1440 minutes"
 
 	// User-facing output language setting (putSettings)
-	errOutputLanguageInvalid = "Unsupported language (must be one of en·ko·zh·es·ja)"
 
 	// Main agent conversation / sessions (newMainSession / chat)
 	errTaskDeletingNewSession = "Cannot create a new session while the task is being deleted"
@@ -201,10 +197,6 @@ type Server struct {
 	archiveWake chan struct{}
 	archiveWG   sync.WaitGroup
 	side        *sideQuestionState
-	// outputLang caches the resolved user-facing output language (string). Every
-	// writeErr, label and agent turn reads it, so it must not hit the settings
-	// table or config.json per call; putSettings refreshes it on change.
-	outputLang atomic.Value
 }
 
 // provEntry is a cached provider + its config for one LLM profile id.
@@ -306,20 +298,6 @@ func New(ctx context.Context, m *Manager, skillDir string, dataDir string, keyDi
 			}
 			return a.TaskTimeoutWrapupMaxTurns, true
 		}
-		// Wire the user-facing output language. Precedence: the runtime setting a
-		// user picked in the UI (settings table) over the bootstrap default
-		// (config.Language() = ARTEX_LANG > config file > "ko"). Resolved once
-		// here and cached in s.outputLang; putSettings refreshes the cache, so a
-		// language change in the UI applies to the next agent turn without a
-		// restart. Both agent.OutputLanguage (langDirective + wrap-up
-		// language tail for LLM-generated text) and config.CurrentLanguage (backend
-		// enum labels such as severity/status) resolve through the same closure, so
-		// generated text and fixed backend strings share one chosen language.
-		s.outputLang.Store(s.loadOutputLanguage())
-		resolveLang := s.outputLanguage
-		agent.OutputLanguage = resolveLang
-		config.CurrentLanguage = resolveLang
-		notify.Lang = resolveLang                       // severity/status labels in push and email follow the same language
 		wireAgentAugment(m.pg, s.skillDir, s.hostTools) // assemble visible skills/MCP + traffic/orchestration host tools into the agent toolsets
 		domainReg := buildDomainReg(m.Assets())
 		wireTools(m.pg, domainReg) // built-in tool table: filter per agent + override descriptions/schemas + inject defaults
@@ -659,13 +637,13 @@ func (s *Server) resolveChatAgent(c *db.Conversation) *agent.ChatAgent {
 func (s *Server) chatUnavailableReason() string {
 	if s.m.pg != nil {
 		if profiles, err := s.m.pg.ListProfiles(); err == nil && len(profiles) == 0 {
-			return trMsg(errChatNoLLMProfile)
+			return errChatNoLLMProfile
 		}
 		if active, err := s.m.pg.ActiveProfile(); err == nil && active == nil {
-			return trMsg(errChatNoActiveLLMProfile)
+			return errChatNoActiveLLMProfile
 		}
 	}
-	return trMsg(errChatLLMNotReady)
+	return errChatLLMNotReady
 }
 
 // providerForProfile returns a cached provider+cfg for a profile id, so every agent
@@ -1525,7 +1503,7 @@ func (s *Server) testLLM(w http.ResponseWriter, r *http.Request) {
 		s.cfgMu.Unlock()
 	}
 	if cfg.APIKey == "" {
-		writeJSON(w, 200, map[string]any{"ok": false, "error": trMsg(errLLMTestNoAPIKey)})
+		writeJSON(w, 200, map[string]any{"ok": false, "error": errLLMTestNoAPIKey})
 		return
 	}
 	// Retry parameters are NOT applied to the connection test: the test has a 30s hard timeout, and stacking configured retry counts/long intervals
@@ -1591,7 +1569,7 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 		req.TimeoutSeconds = 0
 	}
 	if len(req.SourceTaskIDs) > db.MaxTaskSourceCount {
-		writeErr(w, 400, fmt.Sprintf(trMsg(errCreateTaskSourceLimit), db.MaxTaskSourceCount))
+		writeErr(w, 400, fmt.Sprintf(errCreateTaskSourceLimit, db.MaxTaskSourceCount))
 		return
 	}
 	sourceIDs := make([]int64, 0, len(req.SourceTaskIDs))
@@ -1603,7 +1581,7 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if _, ok := s.m.Task(strconv.FormatInt(id, 10)); !ok {
-			writeErr(w, 400, fmt.Sprintf(trMsg(errCreateTaskSourceNotFound), id))
+			writeErr(w, 400, fmt.Sprintf(errCreateTaskSourceNotFound, id))
 			return
 		}
 		seenSources[id] = true
@@ -1611,7 +1589,7 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 	companyIDs, err := db.NormalizeTaskCompanyIDs(req.CompanyIDs)
 	if err != nil {
-		writeErr(w, 400, fmt.Sprintf(trMsg(errCreateTaskCompanyLimit), db.MaxTaskCompanyCount))
+		writeErr(w, 400, fmt.Sprintf(errCreateTaskCompanyLimit, db.MaxTaskCompanyCount))
 		return
 	}
 	req.CompanyIDs = companyIDs
@@ -1654,7 +1632,7 @@ func (s *Server) validateTaskProfileIDs(ids []int64) error {
 		}
 		seen[id] = true
 		if _, ok := s.loadProfileConfig(id); !ok {
-			return fmt.Errorf(trMsg(errLLMProfileNotFound), id)
+			return fmt.Errorf(errLLMProfileNotFound, id)
 		}
 	}
 	return nil
@@ -3401,10 +3379,7 @@ func (s *Server) settingsPayload() map[string]any {
 	if concLimit == 0 {
 		concLimit = defaultConcurrencyLimit // echo a sensible default to the UI even when off
 	}
-	// User-facing output language: runtime setting > config.Language() default (ARTEX_LANG, config file, built-in default).
-	outputLang := s.outputLanguage()
 	return map[string]any{
-		"output_language":          outputLang, // user-facing output language (en/ko/zh/es/ja)
 		"traffic_capture":          s.m.TrafficEnabled(),
 		"agent_traffic_binding":    s.m.pg.GetBool(settingAgentTrafficBinding, false),
 		"llm_record":               s.m.LLMRecordEnabled(),
@@ -3510,9 +3485,6 @@ func (s *Server) putSettings(w http.ResponseWriter, r *http.Request) {
 		NotifyEnabled    *bool   `json:"notify_enabled"`
 		NotifyBaseURL    *string `json:"notify_public_base_url"`
 		NotifyDigestMins *int    `json:"notify_digest_interval_min"`
-		// User-facing output language (en/ko/zh/es/ja). Agent hooks read it every turn, so it applies immediately and
-		// agents need not be rebuilt. null = unchanged.
-		OutputLanguage *string `json:"output_language"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeErr(w, 400, err.Error())
@@ -3536,20 +3508,6 @@ func (s *Server) putSettings(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, 500, err.Error())
 			return
 		}
-	}
-	if req.OutputLanguage != nil {
-		// Only supported languages are accepted. Agent hooks read it every turn, so it applies immediately
-		// and agents need not be rebuilt.
-		lang := config.NormalizeLanguage(*req.OutputLanguage)
-		if lang == "" {
-			writeErr(w, 400, errOutputLanguageInvalid)
-			return
-		}
-		if err := s.m.pg.SetSetting(settingOutputLanguage, lang); err != nil {
-			writeErr(w, 500, err.Error())
-			return
-		}
-		s.outputLang.Store(lang)
 	}
 	// Global push settings: the delivery engine rereads them every round, so they take effect immediately without a restart.
 	if req.NotifyEnabled != nil {
@@ -3770,7 +3728,7 @@ func (s *Server) testWebSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(results) == 0 {
-		writeJSON(w, 200, map[string]any{"ok": false, "error": trMsg(errWebSearchProbeNoResults), "backend": backend})
+		writeJSON(w, 200, map[string]any{"ok": false, "error": errWebSearchProbeNoResults, "backend": backend})
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true, "count": len(results), "backend": backend})
@@ -3997,10 +3955,10 @@ func (s *Server) fallbackChat(t *Task, msg string) string {
 	switch cmd, text := fallbackCommand(msg); cmd {
 	case "intent":
 		_, _ = t.Store.AddIntent(map[string]any{"summary": text}, 9, nil, "human")
-		return trMsg(fallbackIntentInjected) + text
+		return fallbackIntentInjected + text
 	case "hint":
 		_, _ = t.Store.AddNode(db.KindHint, map[string]any{"text": text}, 0, "active", "human", nil)
-		return trMsg(fallbackHintRecorded) + text
+		return fallbackHintRecorded + text
 	default:
 		assetCounts, _ := s.m.Assets().CountsByType()
 		assets := 0
@@ -4009,7 +3967,7 @@ func (s *Server) fallbackChat(t *Task, msg string) string {
 		}
 		fnd, _ := t.Store.ListByKind(db.KindFinding, 1000)
 		fr, _ := t.Store.Frontier(1000)
-		return fmt.Sprintf(trMsg(fallbackChatStatus), assets, len(fr), len(fnd))
+		return fmt.Sprintf(fallbackChatStatus, assets, len(fr), len(fnd))
 	}
 }
 
@@ -4111,7 +4069,7 @@ func writeErr(w http.ResponseWriter, code int, msg string) {
 	// Translate the English source response message into the active output language (ko/zh/es/ja). When it is not in the catalog or
 	// the language is English, the source goes out as-is. Arbitrary err.Error() text propagated from lower layers is usually not a key
 	// and passes through unchanged.
-	writeJSON(w, code, map[string]any{"error": trMsg(msg)})
+	writeJSON(w, code, map[string]any{"error": msg})
 }
 
 func atoiDefault(s string, d int) int {

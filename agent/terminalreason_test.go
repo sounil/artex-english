@@ -9,9 +9,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/Autumn-27/artex/llmrec"
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/llmrec"
+	"artex/norma/harness"
+	"artex/norma/llm"
 )
 
 func TestReasonHintCoversEveryTerminalReason(t *testing.T) {

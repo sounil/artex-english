@@ -15,12 +15,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/llmrec"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/transcript"
-	"github.com/Autumn-27/artex/sidequestion"
+	"artex/agent"
+	"artex/db"
+	"artex/llmrec"
+	"artex/norma/llm"
+	"artex/norma/transcript"
+	"artex/sidequestion"
 )
 
 // User-facing side-question messages surfaced through the HTTP API and

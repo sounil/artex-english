@@ -7,7 +7,7 @@ import (
 	"log"
 	"runtime/debug"
 
-	actool "github.com/Autumn-27/artex/norma/tool"
+	actool "artex/norma/tool"
 )
 
 // DeferredInfo carries the deferred-tools wiring an agent needs to build its

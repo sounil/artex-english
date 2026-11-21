@@ -17,15 +17,13 @@ func assertEnglish(t *testing.T, label, s string) {
 	}
 }
 
-// TestPostgresDSNErrorIsEnglish pins the startup message to English whatever
-// ARTEX_LANG says. When neither ARTEX_PG_DSN nor a config file supplies a database,
+// TestPostgresDSNErrorIsEnglish pins the startup message to English. When neither ARTEX_PG_DSN nor a config file supplies a database,
 // PostgresDSN returns an error that propagates verbatim to the
 // `log.Fatalf("open stores: %v", err)` in cmd/artex/main.go.
 func TestPostgresDSNErrorIsEnglish(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("ARTEX_PG_DSN", "")
 	t.Setenv("ARTEX_CONFIG", filepath.Join(dir, "nope.json"))
-	t.Setenv("ARTEX_LANG", "ko")
 
 	_, _, err := PostgresDSN()
 	if err == nil {
@@ -42,11 +40,10 @@ func TestPostgresDSNErrorIsEnglish(t *testing.T) {
 }
 
 // TestPostgresDSNSourceIsEnglish pins the three source labels, which only reach
-// the startup log, to English whatever ARTEX_LANG says.
+// the startup log, to English.
 func TestPostgresDSNSourceIsEnglish(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "config.json")
-	t.Setenv("ARTEX_LANG", "ko")
 
 	// env source
 	t.Setenv("ARTEX_CONFIG", filepath.Join(dir, "nope.json"))

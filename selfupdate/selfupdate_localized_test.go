@@ -77,25 +77,25 @@ func TestCheckURLErrorsLocalized(t *testing.T) {
 func TestFetchLatestErrorsLocalized(t *testing.T) {
 	ctx := context.Background()
 
-	_, errRate := FetchLatest(ctx, stubClient(http.StatusForbidden, ""), DefaultRepo)
+	_, errRate := FetchLatest(ctx, stubClient(http.StatusForbidden, ""), "owner/repo")
 	assertEnglishError(t, "rate-limited", errRate)
 	if !strings.Contains(errRate.Error(), "60") {
 		t.Errorf("rate-limit error does not mention 60: %q", errRate.Error())
 	}
 
-	_, errNF := FetchLatest(ctx, stubClient(http.StatusNotFound, ""), DefaultRepo)
+	_, errNF := FetchLatest(ctx, stubClient(http.StatusNotFound, ""), "owner/repo")
 	assertEnglishError(t, "not-found", errNF)
 
-	_, errStatus := FetchLatest(ctx, stubClient(http.StatusInternalServerError, ""), DefaultRepo)
+	_, errStatus := FetchLatest(ctx, stubClient(http.StatusInternalServerError, ""), "owner/repo")
 	assertEnglishError(t, "bad-status", errStatus)
 	if !strings.Contains(errStatus.Error(), "GitHub") {
 		t.Errorf("status error does not mention GitHub: %q", errStatus.Error())
 	}
 
-	_, errJSON := FetchLatest(ctx, stubClient(http.StatusOK, "{not json"), DefaultRepo)
+	_, errJSON := FetchLatest(ctx, stubClient(http.StatusOK, "{not json"), "owner/repo")
 	assertEnglishError(t, "bad-json", errJSON)
 
-	_, errTag := FetchLatest(ctx, stubClient(http.StatusOK, "{}"), DefaultRepo)
+	_, errTag := FetchLatest(ctx, stubClient(http.StatusOK, "{}"), "owner/repo")
 	assertEnglishError(t, "missing-tag", errTag)
 	if !strings.Contains(errTag.Error(), "tag") {
 		t.Errorf("missing-tag error does not mention tag: %q", errTag.Error())

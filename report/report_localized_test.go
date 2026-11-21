@@ -7,7 +7,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // containsCJK reports the first Hangul, Han or kana rune in s. The report

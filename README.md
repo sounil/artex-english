@@ -1,14 +1,10 @@
 <div align="center">
 
-# ARTEX — Global Edition
+# ARTEX
 
 **An autonomous penetration-testing system driven by LLM multi-agents** (Go backend + Next.js frontend)
 
-The UI and generated output default to English, and **can be switched to Korean, Chinese, Spanish or Japanese in Settings (System → Settings → Display language).** Changing the language also changes the language of agent-generated reports, summaries and chat replies.
-
-English · [한국어](README.ko.md) · [中文](README.zh.md) · [Español](README.es.md) · [日本語](README.ja.md)
-
-[![ci](https://github.com/jiwoochris/artex-global/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jiwoochris/artex-global/actions/workflows/ci.yml) [![detections](https://github.com/jiwoochris/artex-global/actions/workflows/detections.yml/badge.svg?branch=main)](https://github.com/jiwoochris/artex-global/actions/workflows/detections.yml) [![web](https://github.com/jiwoochris/artex-global/actions/workflows/web.yml/badge.svg?branch=main)](https://github.com/jiwoochris/artex-global/actions/workflows/web.yml) [![license: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+[![license: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
 
 </div>
 
@@ -18,21 +14,19 @@ English · [한국어](README.ko.md) · [中文](README.zh.md) · [Español](REA
 >
 > **This repository is published for use only within authorized environments, and only to build defensive and detection capabilities.**
 >
-> ARTEX is an autonomous offensive tool powerful enough to carry an attack from reconnaissance through intrusion to data exfiltration with little human involvement, so the harm from misuse is correspondingly large. In October 2026, several Korean news outlets reported that investigators had found indications the upstream ARTEX was used in personal-data breaches targeting Korean financial institutions; the related investigation is ongoing. This global edition is not published to help attackers. Its purpose is to help defenders understand how such autonomous AI attacks work and build the capability to detect and block them.
+> ARTEX is an autonomous offensive tool powerful enough to carry an attack from reconnaissance through intrusion to data exfiltration with little human involvement, so the harm from misuse is correspondingly large. In October 2026, several Korean news outlets reported that investigators had found indications the upstream ARTEX was used in personal-data breaches targeting Korean financial institutions; the related investigation is ongoing. This code is not published to help attackers. Its purpose is to help defenders understand how such autonomous AI attacks work and build the capability to detect and block them.
 >
-> - **Unauthorized use is a crime in itself.** Do not run any scanning, probing, or exploitation against systems you do not own or for which you lack explicit written authorization. In the Republic of Korea, unauthorized intrusion into an information and communications network violates the Network Act, and the Personal Information Protection Act also applies where personal data is involved.
+> - **Unauthorized use is a crime in itself.** Do not run any scanning, probing, or exploitation against systems you do not own or for which you lack explicit written authorization.
 > - **Do not target live services or other parties' assets.** Verify only in learning, research, and locally isolated environments you own (deliberately vulnerable targets such as OWASP Juice Shop or DVWA).
-> - **Read it from a defender's point of view.** This repository also compiles defensive and detection material, such as detection signatures and hardening checklists, for autonomous AI attacks. → **[Defense & Detection Guide](docs/defense-en.md)** (also in [Korean](docs/defense-ko.md))
+> - **Read it from a defender's point of view.** This repository also compiles defensive and detection material, such as detection signatures and hardening checklists, for autonomous AI attacks. → **[Defense & Detection Guide](docs/defense-en.md)**
 >
 > If you do not agree to this warning and to the [usage restrictions and disclaimer](#license-and-disclaimer) below, do not download or use this repository.
 
 ---
 
-> **This repository is a localized edition of the Chinese open-source project [Autumn-27/ARTEX](https://github.com/Autumn-27/ARTEX) (AGPL-3.0 · upstream repository currently unreachable, checked 2026-10), adapted so that users and teams worldwide can adopt it as-is.** English is the source language throughout (code, logs, agent prompts), and the user-facing output (findings, summaries, reports, chat replies) is written in the selected language (English by default). See ["Why a global edition"](#why-a-global-edition) below for the rationale.
-
 ARTEX is a system in which several LLM-driven agents autonomously run a penetration test: they **break goals down on their own, execute real tools, and accumulate discovered assets and vulnerabilities into a graph** as they go. A single Go binary ships with the Next.js frontend embedded, and all data is stored in PostgreSQL.
 
-> **Note on this edition's language.** This fork makes the product usable in five languages — **English (default), Korean, Chinese, Spanish, and Japanese** — selectable in Settings. The user-facing output is forced into the selected language. The agents' prompts are now written in English; they were benchmarked in the original Chinese and have not yet been re-benchmarked in English. See [Configuration](#configuration) for how the output language is enforced by a small code-fixed directive.
+This code derives from the Chinese open-source project `Autumn-27/ARTEX` (AGPL-3.0; currently unreachable, checked 2026-10), by way of the multilingual `jiwoochris/artex-global` edition. Neither repository is under this project's control. See [What is different in this version](#what-is-different-in-this-version) and [Credits](#credits).
 
 ---
 
@@ -40,31 +34,41 @@ ARTEX is a system in which several LLM-driven agents autonomously run a penetrat
 
 ARTEX may be used **only against targets you own or for which you have explicit written authorization.** Any scanning, probing, or exploitation beyond the authorized scope may itself be illegal.
 
-- In the Republic of Korea, intruding into or disrupting another party's information and communications network without authorization violates the **Act on Promotion of Information and Communications Network Utilization and Information Protection** (정보통신망법).
-- Personal data collected or exposed during a penetration test is subject to the Korean **Personal Information Protection Act** (개인정보보호법). Even with authorization, handle the access, retention, and deletion of personal data with care.
-- Wherever you are, comply with your own jurisdiction's laws on network security, data protection, and computer crime.
+- Comply with your jurisdiction's laws on network security, data protection, and computer crime. For example, in the Republic of Korea, unauthorized intrusion into another party's network violates the Act on Promotion of Information and Communications Network Utilization and Information Protection, and personal data exposed during a test falls under the Personal Information Protection Act.
+- Even with authorization, handle the access, retention, and deletion of personal data with care.
 - Use this for **learning, research, and verification in locally isolated environments.** Before targeting any live external system, secure written authorization and an agreed scope and time window.
 
 Full license terms, usage restrictions, and the disclaimer are in the [License and disclaimer](#license-and-disclaimer) section below. Using this tool constitutes your agreement to those terms.
 
 ---
 
-## Why a global edition
+## What is different in this version
 
-Upstream ARTEX has its prompts, UI, and documentation entirely in Chinese, which made it cumbersome for anyone who does not read Chinese to read the results and share them with a team. This edition aims to:
+### English only
 
-- **Localize the output** — the findings, fact summaries, final reports, and chat replies that agents surface to a human are forced into the selected language (English by default; Korean, Chinese, Spanish, and Japanese selectable). Commands, payloads, code, URLs, and raw logs are needed for analysis and are left in their original form.
-- **Make the whole codebase readable in English** — code comments, logs, error strings, and the agents' prompts and tool descriptions are written in English, and translations live only in localization files. The prompts were benchmarked in the original Chinese; the English prompts have **not yet been re-benchmarked**, so agent behavior may differ from upstream.
-- **State the legal boundaries** — the "authorized scope only" warning is stated clearly, together with Korea-specific notices on network and privacy law (the maintainers are based in Korea); the law of wherever you operate applies as well.
-- **Support diverse LLM stacks** — the LLM provider can be swapped from a frontier model to any OpenAI-compatible endpoint (domestic or open models). See [Configuration](#configuration).
+The application and its documentation are English only. There is no language picker, no agent output-language setting, no `ARTEX_LANG` variable and no translation file. Agents are instructed to write everything a person reads (findings, fact summaries, reports, chat replies) in English, even when the target or its evidence is in another language; commands, payloads, code, URLs and raw tool output are kept as they are. CI fails if any Chinese, Korean or Japanese character reaches the built UI (`scripts/check-web-cjk.py`), and backend tests assert that server messages are English.
 
-> The localization policy of this multilingual edition is documented in [CONTRIBUTING.md](CONTRIBUTING.md#localization-policy). A Chinese version of this document is available as [`README.zh.md`](README.zh.md).
+The agent prompts were originally benchmarked in Chinese. The English prompts **have not been re-benchmarked**, so agent behavior may differ from upstream.
+
+### No dependencies on code or services this project does not control
+
+- **The agent SDK is vendored.** The `norma` SDK (originally `github.com/Autumn-27/norma` v0.4.4, Apache-2.0) lives in [`norma/`](norma/); the build no longer fetches it. What changed is listed in [`norma/NOTICE.md`](norma/NOTICE.md).
+- **The Go module path has no host in it.** The module is named `artex` (it was `github.com/Autumn-27/artex`), so Go tooling cannot resolve any of its packages to a download from the old upstream location.
+- **Detection rules and docs cite this repository.** The Sigma rules and the ATT&CK layer reference `docs/defense-en.md` in this tree. Upstream repositories are mentioned by name only, never as clickable links.
+- **Updates have no default source and are opt-in.** See [Updating](#updating).
+- **Release images publish under the repository that runs the release** (`ghcr.io/<owner>/<repo>`), never a fixed namespace owned by someone else. `docker-compose.yml` runs a locally built image by default.
+- **Earlier sources are named, not used.** Earlier versions of this code pointed to `Autumn-27/ARTEX` and `jiwoochris/artex-global` (for updates, release images and documentation links). Those repositories are outside this project's control, so take precautions before using either of them as a source for updating or running this software.
+
+### Security checks
+
+- **Run outcomes are reported honestly.** When a model run ends with no output, the run trace says whether the provider's safety system refused (`refusal`, `content_filter`), the model ended normally with nothing to say, or the reply stopped for another reason, and shows the provider's raw stop reason instead of reporting a normal finish.
+- **Outbound connections are documented.** The [Outbound network connections](#outbound-network-connections) section lists every place the code reaches outside the host, and which ones happen without a user action.
 
 ---
 
 ## Screenshots
 
-The three screens below show the default English UI (switchable to Korean, Chinese, Spanish, and Japanese in Settings). The data comes from a local, isolated sandbox: every target is the fictional `acme.com` and private address ranges.
+The data comes from a local, isolated sandbox: every target is the fictional `acme.com` and private address ranges.
 
 <p align="center">
   <img src="screenshots/en/dashboard.png" width="900" alt="Dashboard overview"><br>
@@ -73,53 +77,64 @@ The three screens below show the default English UI (switchable to Korean, Chine
 
 <p align="center">
   <img src="screenshots/en/findings.png" width="900" alt="Findings list"><br>
-  <sub><b>Findings</b> — results aggregated by severity, status, asset, and owning task, exportable to CSV.</sub><br>
-  <sub>Finding <b>titles</b> are model-generated, so English technical terms can appear, mirroring the target app ([Model selection and output language](#model-selection-and-output-language)). The description under each title and the rest of the UI are in English (the default; switchable in Settings).</sub>
+  <sub><b>Findings</b> — results aggregated by severity, status, asset, and owning task, exportable to CSV. Finding titles are model-generated, so technical terms from the target app can appear.</sub>
 </p>
 
 <p align="center">
   <img src="screenshots/en/chat.png" width="900" alt="Human-in-the-loop chat"><br>
-  <sub><b>Chat</b> — a human steps into the autonomous run to inject hints while the agent summarizes the attack chain in English.</sub>
+  <sub><b>Chat</b> — a human steps into the autonomous run to inject hints while the agent summarizes the attack chain.</sub>
 </p>
-
-The original (Chinese UI) screens are available in [`README.zh.md`](README.zh.md#截图预览) (Chinese UI).
 
 ---
 
 ## Quick start (Docker Compose)
 
-> **Prerequisites:** Docker and Docker Compose. The database is **PostgreSQL**, brought up by compose. Exploration requires an **LLM** (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`; can also be set in the UI).
+> **Prerequisites:** Docker and Docker Compose, plus Go 1.26 and Node.js 22 to build the image (or run those builds in their official containers). The database is **PostgreSQL**, brought up by compose. Exploration requires an **LLM** (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`; can also be set in the UI).
 
-> **Image:** the `artex` service in `docker-compose.yml` runs `artex-global:local` by default, an image you build from this checkout (steps in the `Dockerfile` header). To run a published release instead, set `ARTEX_IMAGE` in `.env` to `ghcr.io/jiwoochris/artex-global:latest` or a `v*` tag; this repository publishes that image to GitHub Container Registry on every release tag. Upstream's original image `autumn27/artex` has been taken down from Docker Hub and is no longer used.
+The `artex` service runs `artex-global:local`, an image you build from this checkout:
 
 ```bash
-git clone https://github.com/jiwoochris/artex-global.git
-cd artex-global
+git clone <your repository URL> artex && cd artex
+cd web && npm ci && npm run build:static && cd ..                     # 1) static frontend build
+rm -rf server/webui/dist && mkdir -p server/webui && cp -r web/out server/webui/dist   # 2) embed it
+CGO_ENABLED=0 GOARCH=amd64 go build -tags embedui -o dist/amd64/artex ./cmd/artex       # 3) binary
+docker build -t artex-global:local .                                     # 4) image
 cp .env.example .env          # set POSTGRES_PASSWORD; ANTHROPIC_API_KEY is optional
-docker compose up -d          # brings up the artex image + postgres together
+docker compose up -d          # brings up artex + postgres
 # → open http://localhost:8787 (on first visit, set the admin password at /setup)
 #   /setup asks for the setup token printed in the startup log: docker compose logs artex | grep -F '[auth]'
 ```
 
-The image bundles common tools (ripgrep, curl, vim, npm, nmap, and more), and when brought up with compose, `./skills` and `./data` are bind-mounted to the host and survive container recreation.
+The image bundles common tools (ripgrep, curl, vim, npm, nmap, Playwright with Chromium, and more), and `./skills` and `./data` are bind-mounted to the host so they survive container recreation. To run an image you published yourself, set `ARTEX_IMAGE` in `.env`; only use an image from a registry you control.
 
 ### Other installation methods
 
-Upstream provides several methods: an install script (`./install.sh`), precompiled binaries (Releases), and a single-binary build from source. The commands and full procedure are collected in the "安装" (Installation) section of [`README.zh.md`](README.zh.md#安装) (in Chinese); the essentials are reproduced below.
-
-- **Install script:** running `./install.sh` detects/installs Docker and then lets you choose "① all-in-Docker" or "② local compile and run." "① all-in-Docker" pulls and starts the same image as the quick start above (`ghcr.io/jiwoochris/artex-global`), while "② local compile and run" builds it yourself the same way as the **single-binary build from source** below.
-- **Single-binary build from source:**
+- **Install script:** `./install.sh` detects Docker (offering to install it from `get.docker.com` on Linux) and lets you choose "① all-in-Docker" (the compose setup above; build the image first) or "② local compile and run".
+- **Single binary from source:**
 
   ```bash
-  cd web && npm ci && npm run build:static && cd ..   # 1) static frontend build
-  rm -rf server/webui/dist && mkdir -p server/webui/dist && cp -a web/out/. server/webui/dist/   # 2) sync into the embed directory (avoids nesting on rebuild)
-  CGO_ENABLED=0 go build -tags embedui -o artex ./cmd/artex   # 3) compile with the frontend embedded
+  cd web && npm ci && npm run build:static && cd ..
+  rm -rf server/webui/dist && mkdir -p server/webui/dist && cp -a web/out/. server/webui/dist/
+  CGO_ENABLED=0 go build -tags embedui -o artex ./cmd/artex
   ./start.sh                                          # → http://localhost:8787
   ```
 
-> The `npm ci` in step 1) installs the devDependencies the build needs (e.g. `@tailwindcss/postcss`). If your shell has `NODE_ENV=production` set, `npm ci` skips devDependencies and the build fails with `Error: Cannot find module '@tailwindcss/postcss'`; in that case install with `npm ci --include=dev`.
+> `npm ci` installs the devDependencies the build needs (e.g. `@tailwindcss/postcss`). If your shell has `NODE_ENV=production` set, use `npm ci --include=dev`.
 
-> Launch with `start.sh` (`start.bat` on Windows) rather than running `./artex` directly. That script is a supervisor that restarts the program based on its exit code, and it also handles the UI's "one-click update."
+> Launch with `start.sh` (`start.bat` on Windows) rather than running `./artex` directly. That script is a supervisor that restarts the program based on its exit code, which the one-click update relies on.
+
+---
+
+## Updating
+
+One-click updating is **off by default** and **has no default source**:
+
+- Until an admin turns on **Update checks** in *System → Settings → Update*, ARTEX never contacts GitHub, and checking for or installing updates is refused. Nothing checks automatically; the top-bar badge only shows the result of a check you ran.
+- An update source (a GitHub repository, `owner/name`) must be set in the **Update source** field on that card or with the `ARTEX_UPDATE_REPO` environment variable (the Settings field wins). With neither set, updates are unavailable. An invalid value blocks updates rather than falling back to anything.
+- Installing is always an explicit click. The download is limited to GitHub hosts over verified TLS and checked against the release's `SHA256SUMS`. The source repository must publish releases in the format `build.sh` produces (`artex-<version>-<os>-<arch>.zip` plus `SHA256SUMS`). Development builds (version `dev`) never offer updates.
+- **Precaution:** earlier versions of this code pointed to `Autumn-27/ARTEX` and `jiwoochris/artex-global`. Those repositories are outside this project's control, so take precautions before using either of them as an update source: whoever controls the source controls the binary that gets installed.
+
+Updating from source instead: pull the code you trust, rebuild as in the quick start, and recreate the container (`docker compose up -d artex`).
 
 ---
 
@@ -137,23 +152,21 @@ Upstream provides several methods: an install script (`./install.sh`), precompil
 }
 ```
 
-**LLM:** `export ANTHROPIC_API_KEY=sk-...` (or `OPENAI_API_KEY`), or enter it on the UI's "LLM settings" page. Optional environment variables: `ARTEX_LLM_PROVIDER` / `ARTEX_LLM_MODEL` / `ARTEX_LLM_BASE_URL` / `ARTEX_LLM_PROXY`. To use a domestic or open model, point `ARTEX_LLM_BASE_URL` at an OpenAI-compatible endpoint.
+**LLM:** `export ANTHROPIC_API_KEY=sk-...` (or `OPENAI_API_KEY`), or enter it on the UI's "LLM settings" page. Optional environment variables: `ARTEX_LLM_PROVIDER` / `ARTEX_LLM_MODEL` / `ARTEX_LLM_BASE_URL` / `ARTEX_LLM_PROXY`. To use another model, point `ARTEX_LLM_BASE_URL` at an OpenAI-compatible endpoint.
 
-**Output language:** this edition forces user-facing output into the selected language (English by default) via a small, code-fixed directive appended to each role's system prompt (the prompts themselves are English). Switch languages in Settings, or adapt that directive in `agent/prompt.go` (`langDirective`).
+**Output language:** always English, enforced by a small code-fixed directive appended to each role's system prompt (`langDirective` in `agent/prompt.go`).
 
 **Concurrency:** the number of worker agents spawned per task is adjustable under "System settings" (default 3).
 
 **Common flags:** `./start.sh -addr :8787 -proxy :8788` — `-addr` is the frontend and API, `-proxy` is the traffic-recording proxy port. `-addr` defaults to `127.0.0.1:8787` (local connections only); pass an explicit bind address such as `:8787` to serve other machines (see "First-run protection" below).
 
-### Model selection and output language
+### Model selection
 
-The output-language enforcement is **driven by a prompt directive (`langDirective()` in `agent/prompt.go`), not a hard-coded cap.** So how consistently the output stays in the selected language depends on the model's capability, the role, and the context. The validation figures below were measured with Korean output while Korean was the default and while the agent prompts were still in the original Chinese. The prompts are now English and have not been re-benchmarked, so treat these figures as historical; the same trend is expected for the other languages.
+- **Use a capable frontier model.** English output is enforced by a prompt directive, not a hard limit, so small or cheap models can drift into the language of the target or of an old stored prompt, and leave reports thin.
+- **Refusals are visible.** If a provider's safety system declines a request, the run trace shows "Model refused" with the provider's stop reason. Retrying the same prompt usually gets the same result; reword the task or state the authorization and scope explicitly.
+- **Give reasoning models a generous `max_tokens`.** A reasoning model can spend a small response budget entirely on internal reasoning and leave the answer empty.
 
-- **Use a capable frontier model.** In a short validation run that applied only the production directive against a local isolated sandbox, the default model `claude-opus-4-8` kept user-facing output in Korean across all four roles — planner, worker, reporter, and an authorized-sandbox planning request — with no refusals. `gpt-4o` also stayed in Korean on the same scenarios. A cheaper, smaller model (for example `gpt-4o-mini`), by contrast, let the report fall back to the prompts' original language (Chinese). Output-language quality tracks model capability directly, so use a capable model wherever a human reads the report.
-- **Some role- and context-dependent drift remains.** Divergence shows up in role and output format more than in language itself. In particular, short outputs such as the worker's final one-sentence summary can expose the model's English chain-of-thought verbatim, and the structured fields of `report_finding` can lean toward English, mirroring the target app and its technical terms. In an earlier run, `gpt-4o`'s planner situation summary also reverted to Chinese on some turns. Stating "write in the selected language" explicitly in the task instruction raises the fidelity.
-- **Give reasoning models a generous `max_tokens`.** A reasoning model that uses a separate thinking channel can spend a small response-token budget entirely on internal reasoning and leave the user-facing final answer empty. Here the answer itself disappears rather than the language, so set that LLM profile's `max_tokens` high enough.
-
-> **Token-cap pitfall on the OpenAI-compatible path.** OpenAI-family models such as `gpt-4o` cap response tokens at 16,384. OpenAI-compatible requests, however, carry a larger default output cap (32,768), so leaving it unchanged makes every call fail with `400 (max_tokens is too large)`. In that case, **set that profile's `max_tokens` to 16,384 or lower on the LLM settings page.** Anthropic-family models (including the default `claude-opus-4-8`) allow 32,768 and do not hit this pitfall.
+> **Token-cap pitfall on the OpenAI-compatible path.** OpenAI-family models such as `gpt-4o` cap response tokens at 16,384, while OpenAI-compatible requests default to 32,768, so every call fails with `400 (max_tokens is too large)`. **Set that profile's `max_tokens` to 16,384 or lower on the LLM settings page.** Anthropic-family models allow 32,768.
 
 ### First-run protection (setup token and bind address)
 
@@ -166,15 +179,62 @@ There is a single admin account (`ARTEX`) whose password is created on the first
 
 ### Reverse-proxy deployment (HTTPS / expose only 443)
 
-The frontend and the API/SSE are both served by the same backend port (default `:8787`), and the live activity stream connects **same-origin** by default. So there is no need to set `NEXT_PUBLIC_SSE_BASE` separately: expose only 443 to the public network and keep 8787 internal.
+The frontend and the API/SSE are both served by the same backend port (default `:8787`), and the live activity stream connects **same-origin** by default, so there is no need to set `NEXT_PUBLIC_SSE_BASE`: expose only 443 and keep 8787 internal.
 
-SSE holds a long-lived connection and keeps pushing events, so you **must disable buffering** in the reverse proxy. If you don't, the browser connects but receives no events (the activity stream appears stuck loading). An Nginx configuration example is in [`README.zh.md`](README.zh.md#反向代理部署https--只开放-443).
+SSE holds a long-lived connection and keeps pushing events, so you **must disable buffering** in the reverse proxy; otherwise the browser connects but receives no events (the activity stream appears stuck loading). Nginx example:
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name your.domain.com;
+    # ssl_certificate / ssl_certificate_key ...
+
+    location / {
+        proxy_pass http://127.0.0.1:8787;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # SSE: no buffering, long timeout, HTTP/1.1
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 3600s;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+}
+```
+
+> Set `NEXT_PUBLIC_SSE_BASE` at **build time** only when SSE must use a different origin from the page (for example a separate subdomain); it is baked into the static bundle by `next build`.
+
+---
+
+## Outbound network connections
+
+A review of the code found the following places where ARTEX reaches outside the host. Apart from the startup check noted below, nothing contacts an outside service until a user starts a task, runs a check, or configures an integration.
+
+| What | Where it goes | When |
+|---|---|---|
+| LLM calls (planner, workers, chat, intercept judge) | `api.anthropic.com` / `api.openai.com`, or the base URL of the LLM profile | When tasks or chat run |
+| DNS enrichment of discovered assets | **Public resolvers directly** (Cloudflare 1.1.1.1/1.0.0.1, Google 8.8.8.8/8.8.4.4, Quad9 9.9.9.9/149.112.112.112, OpenDNS 208.67.222.222/208.67.220.220), bypassing the system resolver | Automatically during tasks |
+| HTTP probes during enrichment | Targets, through the recording proxy | Automatically during tasks |
+| Agent **WebFetch** tool | Any URL the model picks, through the recording proxy | Always available to workers |
+| Agent **WebSearch** tool | `html.duckduckgo.com` (default backend), Brave, Tavily, or DeepSeek | Only when enabled in Settings |
+| Agent Bash tools and the Playwright browser | Anything; they use the system resolver | Whatever the agent runs |
+| MCP servers (for example the optional ScopeSentry asset sync) | The URL you configure | Only when configured |
+| Notifications | `api.telegram.org` by default, or your DingTalk, Feishu, WeCom, webhook or SMTP addresses | Only when a channel is configured |
+| Update check and install | `api.github.com`, `github.com`, `*.githubusercontent.com` for the configured source | Only after opting in, setting a source, and clicking |
+
+At startup, a linked library (`cdncheck`) asks the operating system whether an IPv6 route to Google's DNS exists; this sends no packet.
+
+**Build and install time:** the Go build downloads modules through the Go module proxy; the web build downloads npm packages; the `Dockerfile` installs packages from Debian and NodeSource and installs `@playwright/mcp`, `@playwright/cli` and `playwright` from npm at their latest versions, plus Chromium; `install.sh` can run Docker's installer from `get.docker.com`. The web UI itself loads no external fonts, scripts or analytics.
+
+Note the DNS behavior if your rules of engagement require all lookups to go through a specific resolver: target hostnames are sent to the public resolvers above.
 
 ---
 
 ## System architecture
 
-ARTEX is an **autonomous penetration system driven by LLM multi-agents.** It uses a single Go backend (with the Next.js frontend embedded) over PostgreSQL, and the agent capabilities are provided by the [`norma`](norma/) SDK. At its core is a **dual-graph structure** and the two autonomy mechanisms around it: process-level information exchange between workers, and the planner's multi-round shared todolist.
+ARTEX is an **autonomous penetration system driven by LLM multi-agents.** It uses a single Go backend (with the Next.js frontend embedded) over PostgreSQL, and the agent capabilities are provided by the [`norma`](norma/) SDK, which is vendored in this repository. At its core is a **dual-graph structure** and the two autonomy mechanisms around it: process-level information exchange between workers, and the planner's multi-round shared todolist.
 
 ### Overall layers
 
@@ -184,24 +244,24 @@ flowchart TB
     UI["Dashboard · Tasks · Assets · Coverage graph · Traffic · Workspace · System settings"]
   end
   subgraph SRV["server (Go net/http)"]
-    API["REST /api/*　JWT auth　SSE"]
+    API["REST /api/* · JWT auth · SSE"]
     ENG["engine scheduling loop"]
-    MGR["Manager　task/engine/store lifecycle"]
+    MGR["Manager · task/engine/store lifecycle"]
   end
   subgraph AG["agent (norma SDK)"]
-    GO["goals　goal decomposition + scope extraction"]
-    PL["planner　the only intent producer"]
-    WK["worker　executor ×N"]
-    MA["mainagent　human-in-the-loop"]
+    GO["goals · goal decomposition + scope extraction"]
+    PL["planner · the only intent producer"]
+    WK["worker · executor ×N"]
+    MA["mainagent · human-in-the-loop"]
   end
   subgraph DB["PostgreSQL"]
-    AGRAPH["Asset graph　assets / companies / task_scope"]
-    EGRAPH["Exploration graph　exploration_nodes / anchors / activity"]
+    AGRAPH["Asset graph · assets / companies / task_scope"]
+    EGRAPH["Exploration graph · exploration_nodes / anchors / activity"]
   end
   subgraph SUB["Supporting subsystems"]
-    PROXY["traffic-recording proxy　MITM + CA recording"]
-    GUARD["guard / intercept　tool approval gate"]
-    ENR["enrich　async DNS / HTTP enrichment"]
+    PROXY["traffic-recording proxy · MITM + CA recording"]
+    GUARD["guard / intercept · tool approval gate"]
+    ENR["enrich · async DNS / HTTP enrichment"]
     EXT["MCP · skills · memory · report"]
   end
 
@@ -325,15 +385,15 @@ A real attack chain is often an ordered sequence of mutually dependent steps (e.
 flowchart TB
   subgraph TODO["shared todolist (persists per task · resident across wakes)"]
     direction LR
-    T1["1 injection point　[done]"]
-    T2["2 obtain credentials　[in progress]"]
-    T3["3 lateral movement　[awaiting prereq]"]
-    T4["4 privilege escalation　[awaiting prereq]"]
+    T1["1 injection point · [done]"]
+    T2["2 obtain credentials · [in progress]"]
+    T3["3 lateral movement · [awaiting prereq]"]
+    T4["4 privilege escalation · [awaiting prereq]"]
     T1 -. prereq satisfied .-> T2 -.-> T3 -.-> T4
   end
-  R1["round 1 wake　dispatch intent ①"] --> T1
-  R2["round 2 (① yields fact)　dispatch intent ②"] --> T2
-  R3["round 3 (② yields fact)　dispatch intent ③"] --> T3
+  R1["round 1 wake · dispatch intent ①"] --> T1
+  R2["round 2 (① yields fact) · dispatch intent ②"] --> T2
+  R3["round 3 (② yields fact) · dispatch intent ③"] --> T3
 ```
 
 This lets the attack chain progress reliably even in an "event-driven + stateless session" environment — without duplication and without going out of order. This is the core of how ARTEX completes multi-step attack chains autonomously.
@@ -344,7 +404,7 @@ This lets the attack chain progress reliably even in an "event-driven + stateles
 
 This repository aims to help the **defending side** understand how autonomous AI attacks work and build the capability to detect and block them. It takes the ARTEX behavior seen in the architecture above and turns it around into a **defender's view**, laying out what to observe and where to tighten.
 
-- **[Defense & Detection Guide (docs/defense-en.md)](docs/defense-en.md)** (also in [Korean](docs/defense-ko.md))
+- **[Defense & Detection Guide (docs/defense-en.md)](docs/defense-en.md)**
   - How autonomous AI attacks differ from traditional scanners, why they are hard to detect, and how to detect them anyway
   - The fingerprints a defender can observe (IoCs and behavioral signatures) — separated into the target view and the forensic view
   - The entry points attackers target and the corresponding hardening (auxiliary authentication, IDOR, credential stuffing, sessions and secrets)
@@ -356,7 +416,7 @@ This repository aims to help the **defending side** understand how autonomous AI
   - **[Host triage script (detections/triage/)](detections/triage/)**: a read-only script, [`artex_host_triage.py`](detections/triage/artex_host_triage.py), for the responder standing at a single suspected host's shell with no SIEM or network sensor. It checks the same fingerprints the rules above do, plus — on the box itself — the three host/DB indicators the indicator CSV deliberately carries without a Sigma rule because they are not log- or network-observable (the server listen port, the recording-proxy endpoint, the PostgreSQL exploration schema). It runs on the standard library alone with nothing to install, and every finding is a triage lead carrying the same caveat as its indicator row, never an attribution on its own.
   - The rules, the layer, the indicators above, and the host-triage script's self-test are all re-run and verified by the repository tests ([detections/tests/](detections/tests/)): a detection rule you cannot run is only a claim.
 
-> This material is continually expanded. Suggest additional detection rules or hardening items as issues, and when you send a rule directly, please follow the contract in [the "Contributing detection rules and detection tests" section of the contributing guide](CONTRIBUTING.md#contributing-detection-rules-and-detection-tests) (ground every indicator in observable fact, state the limits, pass static validation, and include a reproducible test).
+> This material is continually expanded. When you send a rule, please follow the contract in [the "Contributing detection rules and detection tests" section of the contributing guide](CONTRIBUTING.md#contributing-detection-rules-and-detection-tests) (ground every indicator in observable fact, state the limits, pass static validation, and include a reproducible test).
 
 ---
 
@@ -370,12 +430,12 @@ Local development and testing:
 
 - Backend: `go run ./cmd/artex` (without `-tags embedui` the frontend is not embedded)
 - Frontend: `cd web && npm run dev` (proxies `/api` to the backend, with hot reload)
-- Tests: `go test ./...`
+- Tests: `go test ./...` and `cd web && npx vitest run`
 - Mock preview (no backend): `cd web && NEXT_PUBLIC_MOCK=1 npm run dev`
 
-For other development topics (such as manual vulnerability re-verification), see the "开发" (Development) section of [`README.zh.md`](README.zh.md#开发).
+**Manual vulnerability re-verification.** A finding can be re-tested from the findings list, the finding detail page or the task's "Retest" tab. Each retest runs in its own `retester` agent session (configurable under Agents) without restarting the original task; its verdict is "still reproducible", "fixed" or "cannot confirm", and a "fixed" verdict marks the finding fixed. The original evidence and report are always kept.
 
-The changes this global edition adds on top of upstream ARTEX are tracked in the [changelog (CHANGELOG.md)](CHANGELOG.md).
+Contribution rules (including the English-only policy) are in [CONTRIBUTING.md](CONTRIBUTING.md); the maintainer runbook is in [MAINTAINING.md](MAINTAINING.md); changes are tracked in the [changelog (CHANGELOG.md)](CHANGELOG.md).
 
 ---
 
@@ -383,9 +443,9 @@ The changes this global edition adds on top of upstream ARTEX are tracked in the
 
 ### Open-source license
 
-This project is distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. The full terms are in the [LICENSE](LICENSE) file at the repository root.
+This project is distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. The full terms are in the [LICENSE](LICENSE) file at the repository root. The vendored `norma/` SDK remains under the Apache License 2.0 ([`norma/LICENSE`](norma/LICENSE)).
 
-Anyone is free to use, modify, and distribute it, but **derivative works must also be released under AGPL-3.0.** In particular, if you modify this project and **provide it to users over a network (e.g., as an online service), you must make the corresponding complete source code available to those users.** This global edition likewise keeps AGPL-3.0.
+Anyone is free to use, modify, and distribute it, but **derivative works must also be released under AGPL-3.0.** In particular, if you modify this project and **provide it to users over a network (e.g., as an online service), you must make the corresponding complete source code available to those users.**
 
 > ⚠️ **Important:** an open-source license itself does not restrict how the software may be used. The "Usage restrictions" and "Disclaimer" below are an additional covenant and a serious notice that the original author requires of users — please observe them.
 
@@ -394,7 +454,7 @@ Anyone is free to use, modify, and distribute it, but **derivative works must al
 - Use this tool to **read and study the source code**, and to **verify its technical principles in a locally isolated environment.**
 - Unless the target is one you own or for which you have **explicit written authorization**, do not scan, probe, exploit, or attack any website, online service, or connected system.
 - Using it for illegal intrusion, data theft, denial of service (DoS), or any other destructive or criminal activity is strictly prohibited.
-- You must comply with all laws on network security, data protection, and computer crime in your country and region (in Korea, the Information and Communications Network Act, the Personal Information Protection Act, and others).
+- You must comply with all laws on network security, data protection, and computer crime in your country and region.
 
 ### Disclaimer
 
@@ -404,9 +464,8 @@ This project is provided "AS IS" without any warranty, express or implied. The o
 
 ---
 
-## Upstream project
+## Credits
 
-- Upstream repository: [Autumn-27/ARTEX](https://github.com/Autumn-27/ARTEX) (currently unreachable, checked 2026-10)
-- Original README (Chinese): [README.zh.md](README.zh.md)
-- Original online demo (Chinese UI): [https://artex-demo.vercel.app/](https://artex-demo.vercel.app/)
-- Agent SDK: [`norma/`](norma/)
+- **Upstream project:** `Autumn-27/ARTEX` (AGPL-3.0; currently unreachable, checked 2026-10) and its former online demo `artex-demo.vercel.app`. Upstream contributors credited in its changelog: Autumn-27, neouks, RuoJi6, dingpotian and begininvoke.
+- **Multilingual edition:** `jiwoochris/artex-global`, which produced the English codebase this version builds on.
+- **Agent SDK:** norma ([`norma/`](norma/)), originally `github.com/Autumn-27/norma` v0.4.4 (Apache-2.0). Its experimental noa context compaction is ported from acp-kernel (MIT, © 2026 ranxianglei).

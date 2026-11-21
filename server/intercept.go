@@ -11,11 +11,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/guard"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/llmrec"
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/db"
+	"artex/guard"
+	"artex/intercept"
+	"artex/llmrec"
+	"artex/norma/llm"
 )
 
 // judgeWorkerLane is the usage-ledger "worker" label for intercept fallback-judge
@@ -53,7 +53,7 @@ func (s *Server) wireInterceptReviewer() {
 		}
 		prov, _, ok := s.providerForProfile(profileID)
 		if !ok {
-			return intercept.Decision{ProfileID: profileID}, fmt.Errorf(trMsg(errJudgeModelUnavailable), profileID)
+			return intercept.Decision{ProfileID: profileID}, fmt.Errorf(errJudgeModelUnavailable, profileID)
 		}
 		// Tag this call's usage as the "judge" lane so the config page can report
 		// how much the fallback approval has spent, separate from model profiles.

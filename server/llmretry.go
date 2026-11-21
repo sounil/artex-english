@@ -3,8 +3,8 @@ package server
 import (
 	"time"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
+	"artex/agent"
+	"artex/db"
 )
 
 // Server-side resolution of the retry policy; see the LLM retry design notes. Of the five layers:

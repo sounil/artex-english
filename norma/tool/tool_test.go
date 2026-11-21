@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/permission"
+	"artex/norma/permission"
 )
 
 func run(t *testing.T, tl CoreTool, dir string, in any) Result {

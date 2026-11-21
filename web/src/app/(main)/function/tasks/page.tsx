@@ -204,7 +204,7 @@ function taskDuration(task: Task, nowSec: number): number {
 type DeleteCounts = Omit<DeleteTaskResult, "deleted" | "cleanup_warning">;
 
 // Module-level functions cannot call hooks, so they take the translation function as an argument to build
-// user-facing strings in the display language (as in approval-records).
+// user-facing strings from the string catalog (as in approval-records).
 type Translator = ReturnType<typeof useTranslations>;
 
 function deleteDetails(t: Translator, result: DeleteCounts): string[] {
@@ -1696,7 +1696,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
         const states = await Promise.allSettled(pending.map((id) => api.taskArchive(id)));
         let restored = false;
         states.forEach((state, index) => {
-          // After restore the archived entry is gone, so this becomes a 404 (wording depends on the display language).
+          // After restore the archived entry is gone, so this becomes a 404 (the wording may change, so do not match on it).
           if (state.status !== "rejected" || !(state.reason instanceof ApiError)) return;
           if (state.reason.status !== 404) return;
           pendingRestoreIDs.current.delete(pending[index]);

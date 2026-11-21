@@ -3,8 +3,8 @@ package harness
 import (
 	"sync"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/llm"
+	"artex/norma/tool"
 )
 
 // streamExec is the streaming tool executor: tool_use blocks are registered as

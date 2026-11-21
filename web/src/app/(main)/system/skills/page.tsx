@@ -403,7 +403,7 @@ export default function SkillsPage() {
     } catch (e) {
       const msg = (e as Error).message;
       // offer overwrite when the skill already exists (server_mgmt.go responds with 409).
-      // The message text varies with the display language, so decide by status.
+      // Decide by status, not by the message text.
       if (!overwrite && e instanceof ApiError && e.status === 409) {
         if (window.confirm(t("overwriteConfirm", { msg }))) {
           await uploadZip(file, true);

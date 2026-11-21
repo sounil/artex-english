@@ -46,7 +46,7 @@ body:
         - Agent (agent)
         - Web UI / server (web / server)
         - LLM provider integration
-        - Documentation / translation
+        - Documentation
         - Other
     validations:
       required: false

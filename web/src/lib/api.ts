@@ -107,7 +107,7 @@ import type {
 } from "@/lib/types";
 
 // ApiError is an API error that carries the HTTP status code. Server error messages are
-// translated per display language, so UI logic must branch on status, not on the message.
+// human-readable text that may change, so UI logic must branch on status, not on the message.
 export class ApiError extends Error {
   constructor(
     message: string,

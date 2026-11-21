@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // Detecting and continuing empty turns (thinking only, no text and no tools); see steerHooks.Stop.

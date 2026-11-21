@@ -6,8 +6,8 @@
 //
 // This file is a pure data module (not a client component) and cannot call useTranslations.
 // So text is not hard-coded here; it stores i18n keys (notifyPage namespace), resolved with t() by
-// the components that render them (page.tsx / channel-form.tsx). Keys are ASCII; the upstream Chinese originals
-// live in messages/zh.json. Channel type display names go through notifyPage.kind.<kind>.
+// the components that render them (page.tsx / channel-form.tsx). Keys are ASCII. Channel type display names
+// go through notifyPage.kind.<kind>.
 
 // Config field definitions for each channel.
 //

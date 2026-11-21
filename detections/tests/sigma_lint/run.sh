@@ -12,10 +12,10 @@
 # repo tree):
 #
 #   1. the documented baseline (validators.yml) reports 0 errors and 0 issues
-#   2. the full validator set actually runs, and only the four documented
+#   2. the full validator set actually runs, and only the three documented
 #      exclusions remain — the anti-vacuity guard (see check.sh)
 #
-# The four exclusions and the rationale for each live in validators.yml.
+# The three exclusions and the rationale for each live in validators.yml.
 #
 # Usage:   detections/tests/sigma_lint/run.sh
 # Env:     PYTHON_IMAGE                (default python:3.12-slim)

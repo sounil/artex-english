@@ -1,218 +1,138 @@
-# Upstream Sync and Preventing Translation Drift (Maintainer Guide)
+# Maintainer Guide
 
-[한국어](MAINTAINING.ko.md) · English
+This document lays out how a **maintainer** keeps this codebase consistent: the English-only rule,
+how to bring in outside changes, the checks to run, and the release pipeline. Contribution scope and
+legal responsibility live in [CONTRIBUTING.md](CONTRIBUTING.md); user-facing guidance lives in
+[README.md](README.md).
 
-This document lays out the procedure a **maintainer** follows to keep up with changes in the
-upstream repository [Autumn-27/ARTEX](https://github.com/Autumn-27/ARTEX) (currently unreachable, checked 2026-10) while maintaining the
-the global (multilingual) edition. Contribution scope, legal responsibility, and the localization policy live in
-[CONTRIBUTING.md](CONTRIBUTING.md); user-facing guidance lives in [README.md](README.md).
-This document therefore focuses solely on **how that policy is actually enforced**.
-
-The core rule of the localization can be summed up in one sentence: **English is the source
-language everywhere, and every other language lives only in localization files.** Upstream is
-written in Chinese, so each upstream change has to be brought into English before it lands. The
-procedures and checks below keep that boundary from blurring.
+The code started as a fork of `Autumn-27/ARTEX` (currently
+unreachable, checked 2026-10), by way of the multilingual `jiwoochris/artex-global` edition. Neither
+repository is under this project's control, so treat anything taken from them as outside code: review
+it before it lands, and never point builds, updates or images at them.
 
 ---
 
-## 1. The localization structure at a glance
+## 1. The structure at a glance
 
-This repository **forks** upstream ARTEX and stacks multilingual-localization commits on top of its
-history. Every commit on upstream `main` is contained in this repository's history, with the
-localization commits added above them. Bringing in an upstream change therefore becomes a matter of
-"inspecting the difference against upstream `main`, rewriting its Chinese text in English, and adding
-the translations to the localization files."
-
-The deliverables fall into three groups.
-
-- **English source everywhere outside localization files** (section 2). Code comments, logs, error
-  strings, agent system prompts and tool descriptions, DB seed data, notification text, and
-  report/CSV exports are written in English. The default and fallback language is English.
-- **Output-language selection fixed in code.** `langDirective()` in `agent/prompt.go` (with
-  `agent/outputlang.go`) appends to the end of each role's system prompt an English instruction to
-  write user-facing output in the selected language.
-- **Localization files.** UI strings live in `web/messages/{en,ko,zh,es,ja}.json`. Server-side
-  translations live in tables keyed by the English source (`server/errmsg_catalog.go`,
-  `intercept/label_i18n.go`, and the severity/status labels in `notify/`). Translated docs are
-  `README.{ko,zh,ja,es}.md`, `*.ko.md`, `docs/*-ko.md`, `*-zh.md`, and `CHANGELOG.zh.md`.
+- **English only.** The UI, server messages, logs, notifications, reports, agent prompts, tool
+  descriptions and documentation are English. There is no language setting and no translation file.
+- **UI strings** live in one catalog, `web/messages/en.json`, looked up by key through `next-intl`.
+  Do not hard-code screen text in components.
+- **Agent output.** `langDirective()` in `agent/prompt.go` appends to each role's system prompt an
+  instruction to write everything the user reads in English, even when the target, its evidence or a
+  stored prompt is in another language.
+- **Vendored code.** The agent SDK lives in-tree under [`norma/`](norma/) (see
+  [`norma/NOTICE.md`](norma/NOTICE.md)); there is no external module dependency for it.
 
 ---
 
 ## 2. What stays in English, and the allowed CJK exceptions
 
-Outside the localization files of section 1, write everything in English. When an upstream change
-touches these files, **rewrite its Chinese text in English** and add any user-facing string to the
-localization files.
+Write everything in English. The agent prompts (`agent/promptcatalog.go`, the `agent_prompts` seed and
+the tool descriptions) were originally benchmarked in Chinese and the English versions **have not been
+re-benchmarked yet**, so treat any wording change in them as a behavior change and check it against a
+local isolated sandbox. Existing installs keep the prompts already stored in their database (seeded
+only when empty). Untouched built-in tool descriptions are migrated to English once at startup
+(`server/tool_desc_legacy.go`, flag `tool_desc_english_v1`).
 
-- **The agent prompts are English.** `agent/promptcatalog.go`, the `agent_prompts` seed, and the
-  tool descriptions are fully English. They were originally benchmarked in Chinese, and the English
-  versions **have not been re-benchmarked yet**, so treat any wording change in them as a behavior
-  change and check it against a local isolated sandbox. Existing installs keep the prompts already
-  stored in their database (seeded only when empty), so they keep the old Chinese text. Untouched
-  built-in tool descriptions are migrated to English once at startup (`server/tool_desc_legacy.go`,
-  flag `tool_desc_english_v1`).
-- **Commands, payloads, code, URLs, identifiers, and raw tool output** are not translated. They are
-  the originals needed for analysis.
-- **Allowed CJK outside localization files.** Only these deliberate exceptions may remain:
-  - legacy aliases for old stored data: the `[模型]` model-verdict prefix (now written as
-    `[model]`), Chinese chat-mention tokens such as `@[漏洞#12]` (now written as `@[finding#12]`),
-    old default titles, old trigger words 意图/提示/의도/힌트 still accepted as input, and legacy
-    `[内置] ...` rule names (new seeds use `[Built-in] ...`);
-  - functional matchers: provider quota error texts, ICP 备案 detection, and CJK test inputs;
-  - language autonyms;
-  - the guard marker `【ARTEX 平台管控·非目标防御】` in `guard/guard.go`. The published detection
-    rules in `detections/` match it byte for byte, so it is a detection indicator (see 4.2 and 5.4),
-    not a translation target.
+Commands, payloads, code, URLs, identifiers and raw tool output are never rewritten.
+
+Only these deliberate Chinese, Japanese or Korean exceptions may remain in the source:
+
+- **legacy aliases for old stored data**, so databases written by earlier versions still read and
+  display in English: the `[模型]` model-verdict prefix (now `[model]`), Chinese chat-mention tokens such
+  as `@[漏洞#12]` (now `@[finding#12]`), old default titles, old trigger words 意图/提示/의도/힌트 still
+  accepted as input, legacy `[内置] ...` rule names (new seeds use `[Built-in] ...`), and the mapping in
+  `web/src/lib/builtin-i18n.ts` that shows English labels for those seeds;
+- **functional matchers** for outside input: provider quota error texts, ICP 备案 detection, a skill's
+  grep pattern for Chinese login errors in target JavaScript, and CJK test inputs;
+- **the guard marker** `【ARTEX 平台管控·非目标防御】` in `guard/guard.go`. The published detection rules in
+  `detections/` match it byte for byte, so it is a detection indicator (see 4.2 and 5.4).
 
 ---
 
 ## 3. The upstream tracking base
 
-The upstream remote must be configured as follows. If it is missing, add it.
-
-```bash
-git remote add upstream https://github.com/Autumn-27/ARTEX
-git remote -v   # check that upstream shows up
-```
-
-The upstream base commit that the localization has finished applying is:
+Upstream is currently unreachable. The last upstream commit folded into this code is:
 
 - **Base = `d003372`** (upstream `main`, 2026-10-03, merge of PR #189 `fix/sse-same-origin`).
 
-This value means "every upstream change up to this commit is already folded into this repository."
-Each time you apply a new upstream change, update this base using the method in section 7.
+Do not add `Autumn-27/ARTEX` (or `jiwoochris/artex-global`) as a git remote, and do not fetch, build or
+pull images from either. If one of them comes back, nothing guarantees its contents match the history
+this code was built from, and it may host altered or malicious code. If you want a specific change from
+it, inspect it in a separate, disposable clone, confirm that `d003372` is an ancestor of what you are
+looking at, and port the change by hand as outside code using section 4. Then record the new base using
+section 7.
 
 ---
 
-## 4. The procedure for bringing in upstream changes
+## 4. The procedure for bringing in outside changes
 
-### 4.1 Fetch upstream and inspect the difference
+### 4.1 Inspect the difference
 
 ```bash
 git fetch upstream
-git rev-list --count d003372..upstream/main        # number of unapplied upstream commits
 git log --oneline d003372..upstream/main           # list of unapplied commits
 ```
 
-`git fetch` only updates upstream's remote-tracking branch, so it leaves the working tree and `HEAD`
-untouched. If the count of unapplied commits is 0, you are in sync with upstream and there is nothing
-more to do.
-
 ### 4.2 Classify the changed files
-
-See which files the unapplied commits touched, and split them into the preserved assets of section 2
-and the translation targets.
 
 ```bash
 git log --name-status --oneline d003372..upstream/main
 ```
 
-The classification criteria are as follows.
-
-- If `agent/promptcatalog.go`, the `agent_prompts` seed, or tool descriptions changed → port the
-  change into the English prompt text. Because the English prompts are not yet re-benchmarked,
-  keep the port faithful to the upstream meaning and check the behavior in a local isolated sandbox.
-- If Go backend logic (`db/`, `llmrec/`, `server/`, and so on) changed → apply the logic as is, but
-  rewrite comments, logs, and error strings in English. For **newly introduced user-facing
-  strings** (`writeErr`, and the like), use the English text as the key and add ko/zh/es/ja values
-  to `server/errmsg_catalog.go` (or the matching table).
-- If the UI (`web/src/**`) changed and introduced **new screen strings** → do not hard-code them;
-  add them under the same key to every `web/messages/*.json` file, with `en.json` as the source.
-- If **upstream indicators pinned by the detection rules** changed (the prober User-Agent in
-  `enrich/enrich.go`, the self-update User-Agent in `selfupdate/`, the audit marker in
-  `guard/guard.go`, the destructive-command deny list in `db/db.go`, the default listen and
-  recording-proxy ports in `cmd/artex/main.go`) → bring the Sigma/Suricata rules and the ATT&CK layer
-  in `detections/`, as well as the values in `detections/indicators/artex_indicators.csv`, in line
-  with the new values. These indicators are not translation targets but the **basis of detection**,
-  so when upstream changes a value, the rules silently go stale. The indicator-match test in 5.4
-  catches that mismatch automatically.
+- **Agent prompts or tool descriptions** → port the meaning into the English text and check the
+  behavior in a local isolated sandbox.
+- **Go logic** (`db/`, `llmrec/`, `server/`, ...) → apply the logic, writing comments, logs and error
+  strings in English.
+- **UI** (`web/src/**`) → put new screen strings in `web/messages/en.json`, never hard-coded.
+- **Upstream indicators pinned by the detection rules** (the prober User-Agent in `enrich/enrich.go`,
+  the self-update User-Agent in `selfupdate/`, the audit marker in `guard/guard.go`, the
+  destructive-command deny list in `db/db.go`, the default listen and recording-proxy ports in
+  `cmd/artex/main.go`) → bring the Sigma/Suricata rules, the ATT&CK layer in `detections/` and
+  `detections/indicators/artex_indicators.csv` in line with the new values. The indicator-match test
+  in 5.4 catches a mismatch.
+- **New external dependencies** (modules, images, download URLs, update sources) → do not add one this
+  project does not control without a review; see the dependency notes in README.md.
 
 ### 4.3 Apply
 
-Merge or cherry-pick feature by feature, then rewrite the new strings you separated out in 4.2 in
-English and add their translations. During the merge it is easy for message-file keys to fall out of
-sync or for upstream Chinese to leak into source files, so always run the checks in section 5 right
-after applying.
-
-> **Example (unapplied commits as of 2026-10-05).** The `git fetch upstream` result shows upstream
-> `main` ahead at `b55ceb1`, with 2 commits (`86729b6`, the model-fallback approval-token metering
-> feature, plus the merge commit `b55ceb1`) unapplied relative to base `d003372`. These commits touch
-> Go logic such as `db/llm_usage.go`, `llmrec/llmrec.go`, `server/intercept.go`, and `server/server.go`,
-> and `web/src/app/(main)/system/intercept/page.tsx`, `web/src/lib/api.ts`, `web/src/lib/mock/handler.ts`,
-> and `web/src/lib/types.ts`. The maintainer therefore applies the Go logic as is and only extracts and
-> translates the new screen strings introduced on the intercept settings page into `ko.json` / `zh.json`
-> keys. (These two commits had not yet been applied at the time this document was written, so the base
-> stays at `d003372`.)
+Merge or cherry-pick feature by feature, rewrite any non-English text in English, then run the checks
+in section 5.
 
 ---
 
-## 5. Translation-symmetry and drift checks
+## 5. English-only and drift checks
 
-After applying an upstream change or doing translation work, verify the following.
+### 5.1 No CJK in the built UI
 
-### 5.1 Message-file symmetry and user-facing CJK
-
-Every `web/messages/*.json` file must have exactly the same keys as `en.json`, and no Han characters
-may appear in the `en.json`, `ko.json`, or `es.json` values.
+CI's web workflow runs this gate after the static export; run it locally the same way:
 
 ```bash
-python3 - <<'PY'
-import json, re
-def flatten(d, p=''):
-    out = {}
-    if isinstance(d, dict):
-        for k, v in d.items(): out.update(flatten(v, p + '/' + k))
-    elif isinstance(d, list):
-        for i, v in enumerate(d): out.update(flatten(v, p + '/' + str(i)))
-    else: out[p] = d
-    return out
-han = re.compile(r'[㐀-鿿]')
-en = flatten(json.load(open('web/messages/en.json')))
-print('en leaf keys :', len(en))
-for loc in ['en', 'ko', 'zh', 'es', 'ja']:
-    f = flatten(json.load(open(f'web/messages/{loc}.json')))
-    line = f'{loc}: key symdiff vs en = {len(set(f) ^ set(en))}'          # must be 0
-    if loc in ('en', 'ko', 'es'):
-        line += f', vals w/Han = {sum(1 for v in f.values() if isinstance(v, str) and han.search(v))}'  # must be 0
-    print(line)
-PY
+cd web && npm ci && npm run build:static && cd ..
+python3 -I scripts/check-web-cjk.py   # fails on any Chinese, Korean or Japanese character in web/out
 ```
 
-Baseline (2026-11-17): `en leaf keys = 3080`, every `key symdiff vs en = 0`, every `vals w/Han = 0`.
-The key count grows as features are added, but every symdiff and Han count must stay 0.
+### 5.2 No new CJK outside the allowed exceptions
 
-### 5.2 Make sure no CJK lands outside localization files
-
-Any CJK text added outside the localization files must belong to one of the allowed exceptions in
-section 2. List the added lines that contain CJK, excluding the localization files, and review each
-hit (replace `origin/main` with the base you are comparing against):
+List added lines that contain CJK and review each hit against section 2 (replace `origin/main` with
+the base you are comparing against):
 
 ```bash
-git diff -U0 origin/main -- . ':!web/messages' ':!*.ko.md' ':!*-ko.md' ':!*-zh.md' ':!*.zh.md' \
-    ':!README.*.md' ':!.github/ISSUE_TEMPLATE/*_ko.yml' \
+git diff -U0 origin/main -- . \
   | grep -P '^\+(?!\+\+).*[\x{3040}-\x{30FF}\x{3400}-\x{9FFF}\x{AC00}-\x{D7AF}]'
 ```
 
-Hits in the translation tables (`server/errmsg_catalog.go`, `intercept/label_i18n.go`, `notify/`),
-in tests with CJK inputs, or in the legacy aliases, matchers, autonyms, and guard marker of section 2
-are expected. Anything else (a Chinese comment, log, error string, or prompt line carried over from
-upstream) must be rewritten in English.
+### 5.3 Backend messages stay English
 
-### 5.3 Make sure no original language leaks into the build output
-
-After exporting the UI statically, Chinese appearing in the prerendered HTML means a missing
-translation.
-
-```bash
-cd web && npm ci && NEXT_EXPORT=1 npm run build   # generates out/
-# check that the visible text in out/**/*.html contains 0 Chinese characters
-```
+The `*_localized_test.go` tests assert that server, notification, report and intercept messages
+contain no Han, Hangul or kana. They run with `go test ./...`.
 
 ### 5.4 Make sure the detection indicators still match the upstream source
 
 The rules in `detections/` are based on the strings that upstream actually emits (prober User-Agent,
 self-update User-Agent, audit marker, destructive-command deny list). When an upstream re-sync changes
-these values, the translation checks all pass while only the shipped rules silently stop matching. The
+these values, everything else still passes while only the shipped rules silently stop matching. The
 test below verifies bidirectionally that each indicator is still present in both the upstream source
 and the rules, so run it after a re-sync.
 
@@ -250,7 +170,7 @@ backend plugin changes its support, the `sigma_backends` test gives the same sig
 
 ## 6. Finishing with build and test verification
 
-After applying and translating, verify the backend and frontend per the
+After applying a change, verify the backend and frontend per the
 [development environment procedure in CONTRIBUTING.md](CONTRIBUTING.md#development-environment).
 If you do not have Go locally, you can run the same thing under Docker.
 
@@ -260,11 +180,9 @@ docker run --rm -v "$PWD":/src -w /src \
   golang:1.26 sh -c 'go build ./... && go vet ./... && go test ./... -count=1'
 ```
 
-When you translate a user-facing string, add a regression test (`*_localized_test.go`) that asserts
-that string as well, so that if a later upstream change pulls Chinese back in, the test catches it.
-Always do output-language verification with a capable (frontier-class) model. Low-cost, small models
-can drift into another language, so you must not judge whether a translation applied from their
-output alone.
+When you add a user-facing backend string, add a regression test (`*_localized_test.go`) that asserts
+it is English, so that if a later change pulls Chinese back in, the test catches it. Check agent output
+language with a capable (frontier-class) model; small models can drift into another language.
 
 ---
 
@@ -279,32 +197,32 @@ Commit messages follow the [commit-message rules in CONTRIBUTING.md](CONTRIBUTIN
 For example, an upstream-sync commit is written like this.
 
 ```
-chore(upstream): apply upstream d003372..b55ceb1 (intercept token metering) + translate new UI strings
+chore(upstream): apply upstream d003372..b55ceb1 (intercept token metering), English strings
 ```
 
 ---
 
 ## 8. Review and verification rules of thumb (common pitfalls)
 
-Here are two pitfalls maintainers repeatedly fall into when checking upstream applies, translations,
-and documentation improvements. Both are cases where "the checking method itself is wrong, so you
+Here are two pitfalls maintainers repeatedly fall into when checking upstream applies and documentation
+improvements. Both are cases where "the checking method itself is wrong, so you
 mistake something healthy for broken," so they are fixed here as rules of thumb to prevent unnecessary
 reverts.
 
 ### 8.1 Check the repository's CI status by specifying the repository
 
-This repository is a fork of upstream ARTEX, so the local `git remote` has both `origin`
-(jiwoochris/artex-global) and `upstream` (Autumn-27/ARTEX) registered (see section 3). In this state, if
-you do not specify a repository in a `gh` command, `gh` **picks the upstream repository as the
-default** and shows you run results from upstream, which does not have our workflows. You can then see
+If the local `git remote` has more than one GitHub repository registered (for example your `origin` plus
+an `upstream`, see section 3), then if
+you do not specify a repository in a `gh` command, `gh` **may pick the other repository as the
+default** and show you run results from it, which does not have our workflows. You can then see
 upstream CI green and **mistakenly think our CI passed**, or judge our workflows (`ci.yml`,
 `detections.yml`) as "HTTP 404 ... not found" by mistake.
 
 So when checking CI, always name the repository explicitly.
 
 ```bash
-gh run list -R jiwoochris/artex-global --workflow ci.yml --limit 5
-gh run list -R jiwoochris/artex-global --workflow detections.yml --limit 5
+gh run list -R OWNER/REPO --workflow ci.yml --limit 5         # OWNER/REPO = your repository
+gh run list -R OWNER/REPO --workflow detections.yml --limit 5
 ```
 
 Once set, you can make `gh` default to our repository even when you omit `-R`. Note, however, that
@@ -312,14 +230,14 @@ this setting is a **local gh setting** and is not committed to the repository, s
 again on a new machine or a new checkout.
 
 ```bash
-gh repo set-default jiwoochris/artex-global
-gh repo set-default --view   # check that jiwoochris/artex-global shows up
+gh repo set-default OWNER/REPO
+gh repo set-default --view   # check that your repository shows up
 ```
 
 ### 8.2 Check external links in documents with GET, like a browser
 
-Section 7 of the defense guide ([`docs/defense-en.md`](docs/defense-en.md) ·
-[`defense-ko.md`](docs/defense-ko.md)) carries links to Korean official channels (boho.or.kr,
+Section 7 of the defense guide ([`docs/defense-en.md`](docs/defense-en.md)) carries links to Korean
+official channels (boho.or.kr,
 fsec.or.kr, pipc.go.kr). When checking whether these links are alive, using only `curl -I` (a HEAD
 request) or the default User-Agent will **mistake a healthy link for a broken one**. Korean public and
 security agency sites refuse a simple check for three reasons.
@@ -358,9 +276,9 @@ blocked) · ALLOWED (a known upstream-inherited dead link we cannot fix, listed 
 
 External-link liveness is flaky, so it is **not a merge gate**. Instead the non-blocking
 [`external-links`](.github/workflows/external-links.yml) workflow runs `--strict` every Monday and on
-manual dispatch, turning red when a DOWN not on the allowlist newly appears. Dead links inherited by
-upstream-preserved files (for example a vanished contributor account credited in `CHANGELOG.zh.md`) are
-ones we cannot fix, so they go on the allowlist with a reason and are excluded from the strict check.
+manual dispatch, turning red when a DOWN not on the allowlist newly appears. Dead upstream links kept
+only for attribution (for example the unreachable upstream repository) are ones we cannot fix, so they
+go on the allowlist with a reason and are excluded from the strict check.
 
 ---
 
@@ -368,7 +286,8 @@ ones we cannot fix, so they go on the allowlist with a reason and are excluded f
 
 Pushing a version tag (`v*`) makes [`.github/workflows/release.yml`](.github/workflows/release.yml)
 build binaries for five platforms and, when a condition is met, a multi-architecture Docker image.
-This fork has published stable release tags (`v0.3.15-global.1`, `v0.3.15-ko.1`), so this workflow has run. This section records
+Earlier editions of this code published release tags (`v0.3.15-global.1`, `v0.3.15-ko.1`) from another
+repository; none have been published from this one yet. This section records
 what the pipeline assumes and produces, and whether those assumptions match the current repository
 structure. Because pushing a tag creates a GitHub Release on the public repository, cut a release only
 after the publishing decision is made.
@@ -394,7 +313,7 @@ The workflow is split into four jobs.
 - **release.** Gathers all zips, generates a `SHA256SUMS` checksum file, and creates a GitHub Release
   with the zips and the checksum attached.
 - **docker.** Takes the linux binaries cross-compiled by binaries, builds a multi-architecture
-  (amd64/arm64) image, and pushes it to GitHub Container Registry as `ghcr.io/jiwoochris/artex-global`
+  (amd64/arm64) image, and pushes it to GitHub Container Registry as `ghcr.io/<owner>/<repo>`
   with the release tag and `latest`. It logs in with the workflow's built-in `GITHUB_TOKEN` (job
   permission `packages: write`), so no extra secrets are needed.
 
@@ -419,12 +338,13 @@ current repository structure by reproducing the binaries job locally.
 
 ### 9.4 The Docker image namespace
 
-Images are published to `ghcr.io/jiwoochris/artex-global`, a namespace this fork owns, and
-`docker-compose.yml` pulls that image (decided 2026-10-11, `work/DECISIONS-FOR-JIWOO.md`, item 8).
-Upstream's `autumn27/artex` has been taken down from Docker Hub and this fork has no push access to
-it, so it is no longer used. A GHCR package may be created as private on its first publish, so after
-the first release check in the package settings that it is public; if it is private,
-`docker compose pull` fails with an authentication error.
+Images are published to `ghcr.io/<owner>/<repo>` of whichever repository runs the release workflow
+(`IMAGE_NAMESPACE: ghcr.io/${{ github.repository }}`), so a release never pushes to a namespace this
+project does not control. `docker-compose.yml` runs the locally built `artex-global:local` by default;
+point `ARTEX_IMAGE` at your published image only if you want to. Upstream's `autumn27/artex` (Docker Hub)
+and the earlier `ghcr.io/jiwoochris/artex-global` are outside this project's control and are not used. A
+GHCR package may be created as private on its first publish; check its visibility in the package
+settings after the first release.
 
 ### 9.5 Verifying locally without a tag
 

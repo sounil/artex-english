@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	actool "github.com/Autumn-27/artex/norma/tool"
+	actool "artex/norma/tool"
 )
 
 func TestCamelToSnake(t *testing.T) {

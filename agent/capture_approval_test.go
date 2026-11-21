@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/guard"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/norma/agentcore"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/permission"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/db"
+	"artex/guard"
+	"artex/intercept"
+	"artex/norma/agentcore"
+	"artex/norma/llm"
+	"artex/norma/permission"
+	"artex/norma/tool"
 )
 
 // Exercise the actual SDK event -> hook -> execution -> result path. No real

@@ -11,11 +11,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/agent"
+	"artex/db"
+	"artex/intercept"
+	"artex/norma/harness"
+	"artex/norma/llm"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -451,11 +451,11 @@ func (e *Engine) ControlWork(ctx context.Context, intentID int64, action string)
 	run := e.work[intentID]
 	if run == nil {
 		e.workMu.Unlock()
-		return fmt.Errorf(trMsg(errWorkControlNoRunningWorkFmt), errWorkControlConflict, intentID)
+		return fmt.Errorf(errWorkControlNoRunningWorkFmt, errWorkControlConflict, intentID)
 	}
 	if run.action != "" {
 		e.workMu.Unlock()
-		return fmt.Errorf(trMsg(errWorkControlBusyFmt), errWorkControlConflict, intentID, run.action)
+		return fmt.Errorf(errWorkControlBusyFmt, errWorkControlConflict, intentID, run.action)
 	}
 	run.action = action
 	done := run.done
@@ -473,10 +473,10 @@ func (e *Engine) ControlWork(ctx context.Context, intentID int64, action string)
 		return err
 	case <-ctx.Done():
 		e.releaseWorkControl(intentID, run, action)
-		return fmt.Errorf(trMsg(errWorkControlWaitFmt), intentID, action, ctx.Err())
+		return fmt.Errorf(errWorkControlWaitFmt, intentID, action, ctx.Err())
 	case <-timer.C:
 		e.releaseWorkControl(intentID, run, action)
-		return fmt.Errorf(trMsg(errWorkControlWaitFmt), intentID, action, context.DeadlineExceeded)
+		return fmt.Errorf(errWorkControlWaitFmt, intentID, action, context.DeadlineExceeded)
 	}
 }
 

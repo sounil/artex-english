@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // Manual CRUD endpoints for the overview "Constraint management" UI + parsing of the injection-scope toggles. Operation constraints (allow/deny) share

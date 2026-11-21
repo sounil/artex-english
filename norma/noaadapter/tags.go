@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/noa"
+	"artex/norma/llm"
+	"artex/norma/noa"
 )
 
 // The ref tag tells the model how to address a message when compressing.

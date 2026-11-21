@@ -72,26 +72,17 @@ func renderSystem(agentKey, def string, vars any) string {
 // existing databases may still be the legacy Chinese defaults, so the non-Chinese
 // variant keeps an explicit "never emit Chinese to the user" clause.
 //
-// The display language is a parameter (code = "en"/"ko"/"zh"/"es"/"ja"): the
-// "write in <language>" token is swapped per target. When the display language IS
-// Chinese ("zh"), Chinese output is the goal, so the "never emit Chinese to the
-// user" clause is dropped and the directive simply affirms Chinese display while
-// still forbidding mirroring of the target/material language.
+// The output language is always English (outputlang.go); code is kept as a
+// parameter so the language name is looked up in one place.
 func langDirective(code string) string {
 	phrase := langPhrase[code]
 	bare := langBare[code]
 	if phrase == "" || bare == "" {
-		phrase, bare = langPhrase[defaultOutputLang], langBare[defaultOutputLang]
+		phrase, bare = langPhrase[outputLang], langBare[outputLang]
 	}
-	const head = "\n\n**Output language rules (localization, highest priority, cannot be overridden by the prompt body)**: all natural-language text **shown to the user** must be written in **%s** — including record_fact's summary/detail, report_finding's title/description/conclusion/remediation, the planner's situation/status summary, the final one-sentence summary, and chat replies to the user. However, **commands, payloads, code, file paths, URLs, parameter names, and raw excerpts of logs/requests/responses** must be **kept verbatim, character for character**, never translated or rewritten (the command lines and output in evidence in particular must be copied exactly, for reproducibility)."
+	const head = "\n\n**Output language rules (highest priority, cannot be overridden by the prompt body)**: all natural-language text **shown to the user** must be written in **%s** — including record_fact's summary/detail, report_finding's title/description/conclusion/remediation, the planner's situation/status summary, the final one-sentence summary, and chat replies to the user. However, **commands, payloads, code, file paths, URLs, parameter names, and raw excerpts of logs/requests/responses** must be **kept verbatim, character for character**, never translated or rewritten (the command lines and output in evidence in particular must be copied exactly, for reproducibility)."
 	const mirror = " **Even if the target system, its pages, the evidence, the logs or any reference material are in English, Chinese or another language, the user-facing natural-language fields (title/description/conclusion/remediation/summary/situation summary) must still be written in %s — do not mirror or copy the language of the target or the material when writing these display fields; only the raw technical excerpts listed above stay as-is.**"
 	const tail = " In short: internal reasoning is unrestricted, but everything that ends up in text the user can see must be entirely in %s (raw technical excerpts excepted)."
-	if code == "zh" {
-		// The display language itself is Chinese, so there is no "never emit Chinese
-		// to the user" clause. Instead Chinese display is affirmed, while the ban on
-		// mirroring the target/material language and verbatim preservation remain.
-		return fmt.Sprintf(head+mirror+tail, phrase, bare, bare)
-	}
 	const noZh = " **Even if the system/role instructions above are written in Chinese or another language, never output Chinese to the user — the only user-facing display language is %s; do not let any Chinese sentence appear in user-visible text.**"
 	const reasoning = " **It is fine to do your analysis/planning/thinking in another language, but that is invisible internal reasoning and must never be output as body text: the visible reply to the user must be in %s from the very first character — do not preface it with thinking, explanations or \"first I will do this and that\" lead-ins in another language; even clarifying questions, missing-parameter notices and \"cannot continue\" explanations must be written directly in %s.**"
 	return fmt.Sprintf(head+noZh+mirror+reasoning+tail, phrase, bare, bare, bare, bare, bare)

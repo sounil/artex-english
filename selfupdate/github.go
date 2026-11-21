@@ -3,6 +3,7 @@ package selfupdate
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -12,8 +13,10 @@ import (
 	"time"
 )
 
-// DefaultRepo is the release source used when neither the Settings field nor ARTEX_UPDATE_REPO sets one.
-const DefaultRepo = "sounil/artex-english"
+// There is deliberately no default release source. Earlier versions of this code pointed at
+// "Autumn-27/ARTEX" and "jiwoochris/artex-global"; both are outside this project's control, so
+// anyone choosing one of them as the source should take precautions first. Until a source is set
+// in Settings or through ARTEX_UPDATE_REPO, update checks and installs are unavailable.
 
 // RepoEnv names the environment variable that sets the release source ("owner/name" on GitHub) when the
 // Settings field is empty.
@@ -23,11 +26,14 @@ const DefaultRepo = "sounil/artex-english"
 // explicit click plus a SHA256SUMS match from that release.
 const RepoEnv = "ARTEX_UPDATE_REPO"
 
+// ErrNoRepo reports that no release source is configured (see the note on RepoEnv).
+var ErrNoRepo = errors.New("no update source is configured: set one in Settings or with " + RepoEnv)
+
 // Where the effective release source came from (ResolveRepo).
 const (
 	RepoFromSettings = "settings"
 	RepoFromEnv      = "env"
-	RepoFromDefault  = "default"
+	RepoNotSet       = "none"
 )
 
 // repoPattern accepts GitHub's "owner/name" form: owner up to 39 alphanumerics or hyphens (not leading),
@@ -35,7 +41,7 @@ const (
 var repoPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9._-]{1,100}$`)
 
 // ResolveRepo returns the effective release source and where it came from: the Settings value
-// (setting) when non-empty, else ARTEX_UPDATE_REPO, else DefaultRepo. An invalid value is an error
+// (setting) when non-empty, else ARTEX_UPDATE_REPO, else ErrNoRepo. An invalid value is an error
 // rather than a silent fallback, so a typo never sends update checks somewhere nobody chose.
 func ResolveRepo(setting string) (repo, source string, err error) {
 	if v := strings.TrimSpace(setting); v != "" {
@@ -52,7 +58,7 @@ func ResolveRepo(setting string) (repo, source string, err error) {
 		}
 		return repo, RepoFromEnv, nil
 	}
-	return DefaultRepo, RepoFromDefault, nil
+	return "", RepoNotSet, ErrNoRepo
 }
 
 // ValidateRepo checks a GitHub "owner/name" and returns it trimmed.

@@ -12,10 +12,10 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
-	actool "github.com/Autumn-27/artex/norma/tool"
+	"artex/agent"
+	"artex/db"
+	"artex/intercept"
+	actool "artex/norma/tool"
 )
 
 // User-facing HTTP error responses. The four messages below are only returned by the startFindingRetest

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 func manyReadPairs(n int) []llm.Message {

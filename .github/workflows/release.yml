@@ -99,7 +99,7 @@ jobs:
   # (4) Multi-arch image -> push to GitHub Container Registry (ghcr.io) (reuses the Linux binaries built by binaries;
   #    the image only installs tools + places the binary; arm64 only needs to emulate the apt layer, so builds are much faster)
   #    Login uses the workflow's default GITHUB_TOKEN, so no separate secret is needed. Upstream autumn27/artex (Docker Hub)
-  #    was taken down and this fork has no push rights to that namespace, so it publishes to this fork's own ghcr namespace.
+  #    was taken down, so images publish to the ghcr namespace of whichever repository runs this workflow.
   docker:
     needs: [binaries]
     runs-on: ubuntu-latest
@@ -107,7 +107,9 @@ jobs:
       contents: read
       packages: write
     env:
-      IMAGE_NAMESPACE: ghcr.io/jiwoochris/artex-global
+      # The repository running the release (metadata-action lowercases it), so images never go to a namespace
+      # this project does not control.
+      IMAGE_NAMESPACE: ghcr.io/${{ github.repository }}
     steps:
       - uses: actions/checkout@v4 # fetches the Dockerfile and skills/
       - uses: actions/download-artifact@v4

@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Autumn-27/artex/selfupdate"
+	"artex/selfupdate"
 )
 
 // HTTP surface of the in-page one-click update. The real download/verify/swap logic lives in the selfupdate package;
@@ -40,7 +40,8 @@ const (
 const settingUpdateCheck = "update_check_enabled"
 
 // settingUpdateRepo is the release source ("owner/name") chosen in Settings. Empty means "use
-// ARTEX_UPDATE_REPO, else selfupdate.DefaultRepo" (see selfupdate.ResolveRepo).
+// ARTEX_UPDATE_REPO"; with neither set there is no source and updates are unavailable
+// (see selfupdate.ResolveRepo).
 const settingUpdateRepo = "update_repo"
 
 // updatesEnabled reports whether the operator opted in to update checks.
@@ -299,6 +300,11 @@ func (s *Server) updateCheck(w http.ResponseWriter, r *http.Request) {
 	repo, source, repoErr := s.updateRepo()
 	out["repo"] = repo
 	out["repo_source"] = source
+	out["repo_configured"] = repoErr == nil
+	if errors.Is(repoErr, selfupdate.ErrNoRepo) {
+		writeJSON(w, 200, out) // no source configured: nothing to check, and not an error
+		return
+	}
 	if repoErr != nil {
 		out["error"] = repoErr.Error()
 		writeJSON(w, 200, out)

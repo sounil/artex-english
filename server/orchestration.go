@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/norma/permission"
-	actool "github.com/Autumn-27/artex/norma/tool"
+	"artex/agent"
+	"artex/db"
+	"artex/norma/permission"
+	actool "artex/norma/tool"
 )
 
 // jsonResult marshals v to a JSON tool result.

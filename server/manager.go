@@ -14,13 +14,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Autumn-27/artex/agent"
-	pgdb "github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/enrich"
-	"github.com/Autumn-27/artex/guard"
-	"github.com/Autumn-27/artex/intercept"
-	actool "github.com/Autumn-27/artex/norma/tool"
-	"github.com/Autumn-27/artex/traffic"
+	"artex/agent"
+	pgdb "artex/db"
+	"artex/enrich"
+	"artex/guard"
+	"artex/intercept"
+	actool "artex/norma/tool"
+	"artex/traffic"
 )
 
 // Task is one engagement: a description + goal + its own exploration store,
@@ -275,10 +275,6 @@ const (
 	// the platform (planner/worker/main agent/chat) have their context compaction taken over by noa instead of the built-in compaction.
 	// Read once per run; toggling only affects runs started afterwards.
 	settingNoaCompaction = "noa_compaction"
-	// settingOutputLanguage is the runtime value of the user-facing output language ("en"/"ko"/"zh"/"es"/"ja").
-	// When empty it falls back to config.Language() (ARTEX_LANG, config file, then the default). Both the agent
-	// output language (langDirective) and the backend message catalog follow this value.
-	settingOutputLanguage = "output_language"
 	// defaultWebSearchBackend is used when web search is on but no backend was picked.
 	defaultWebSearchBackend = "ddgs"
 	// deepSeekWebSearchBackend borrows the active LLM profile instead of its own

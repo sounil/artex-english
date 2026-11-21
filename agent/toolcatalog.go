@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	actool "github.com/Autumn-27/artex/norma/tool"
+	actool "artex/norma/tool"
 )
 
 // This file turns the "builtin tools" from pure code into an enumerable catalog that the DB can override:

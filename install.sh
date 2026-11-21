@@ -48,8 +48,8 @@ install_docker(){
   info "pulling images and starting…"
   docker compose pull || true
   if ! docker compose up -d; then
-    warn "could not pull or start the image ghcr.io/jiwoochris/artex-global (check that ARTEX_TAG in .env is a published tag and that the network works)"
-    warn "you can run this script again and choose \"2) Local run (go compile)\", or build from source (see the Installation section of README.zh.md)"
+    warn "could not start the ARTEX image (check ARTEX_IMAGE in .env: empty means artex-global:local, built from this checkout as described in the Dockerfile header)"
+    warn "you can run this script again and choose \"2) Local run (go compile)\", or build from source (see the Installation section of README.md)"
     die "Docker Compose (all Docker) failed to start"
   fi
   ok "started → http://localhost:8787"

@@ -51,16 +51,8 @@ func assertEnglish(t *testing.T, where, got string) {
 	}
 }
 
-// withLang sets the injected output language for the duration of a test.
-func withLang(t *testing.T, lang string) {
-	t.Helper()
-	prev := Lang
-	Lang = func() string { return lang }
-	t.Cleanup(func() { Lang = prev })
-}
-
 // TestSeverityLabelLocalized checks every severity enum renders an English label by
-// default and the Korean translation when the language is ko. Labels are shared by
+// and that unknown values are echoed back. Labels are shared by
 // every notification channel, so a regression mixes languages across all messages.
 func TestSeverityLabelLocalized(t *testing.T) {
 	want := map[string]string{
@@ -81,23 +73,9 @@ func TestSeverityLabelLocalized(t *testing.T) {
 		t.Errorf("unknown severity should be kept as is, got %q", got)
 	}
 
-	// language=ko → Korean translation table.
-	withLang(t, "ko")
-	koWant := map[string]string{
-		"critical": "심각",
-		"high":     "높음",
-		"medium":   "중간",
-		"low":      "낮음",
-	}
-	for sev, label := range koWant {
-		if got := SeverityLabel(sev); !strings.Contains(got, label) {
-			t.Errorf("ko SeverityLabel(%q)=%q, should contain %q", sev, got, label)
-		}
-	}
 }
 
-// TestStatusLabelLocalized checks all nine triage statuses render in English by
-// default and match the Korean translation when the language is ko.
+// TestStatusLabelLocalized checks all nine triage statuses render in English.
 func TestStatusLabelLocalized(t *testing.T) {
 	want := map[string]string{
 		"pending":        "Pending",
@@ -122,24 +100,6 @@ func TestStatusLabelLocalized(t *testing.T) {
 		t.Errorf("unknown status should be kept as is, got %q", got)
 	}
 
-	// language=ko → Korean translation table (must match the UI status.finding namespace).
-	withLang(t, "ko")
-	koWant := map[string]string{
-		"pending":        "처리 대기",
-		"in_progress":    "처리 중",
-		"confirmed":      "확인됨",
-		"resolved":       "처리됨",
-		"fixed":          "수정됨",
-		"false_positive": "오탐",
-		"ignored":        "무시",
-		"duplicate":      "중복",
-		"risk_accepted":  "위험 수용",
-	}
-	for status, label := range koWant {
-		if got := StatusLabel(status); got != label {
-			t.Errorf("ko StatusLabel(%q)=%q, want %q", status, got, label)
-		}
-	}
 }
 
 // TestItemTitlePlaceholderLocalized checks that an item with neither name nor type

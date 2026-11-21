@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // Simulates a long-running conversation that repeatedly grows past the auto

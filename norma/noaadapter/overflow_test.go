@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // The three harness-facing methods are the whole public surface between noa and

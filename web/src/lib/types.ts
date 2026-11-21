@@ -949,9 +949,6 @@ export interface Settings {
   notify_enabled?: boolean; // master notification switch, on by default; for one-click stop during maintenance
   notify_public_base_url?: string; // external base URL for vulnerability detail backlinks; empty = messages carry no backlink
   notify_digest_interval_min?: number; // digest mode interval (minutes), default 30
-  // User-facing output language (en/ko/zh/es/ja). Agent-generated reports, summaries and chat replies
-  // follow this language. The settings screen's "display language" picker saves this value together with the UI language.
-  output_language?: string;
 }
 
 // ---- Vulnerability IM notifications ----
@@ -1575,10 +1572,12 @@ export interface UpdateCheck {
   mode: "docker" | "binary";
   os: string;
   arch: string;
-  /** Effective GitHub "owner/name" updates come from: the Settings value, else ARTEX_UPDATE_REPO, else the default. */
+  /** Effective GitHub "owner/name" updates come from: the Settings value, else ARTEX_UPDATE_REPO. "" when neither is set. */
   repo: string;
-  /** Where `repo` came from. */
-  repo_source: "settings" | "env" | "default";
+  /** Where `repo` came from; "none" when no source is configured (updates are then unavailable). */
+  repo_source: "settings" | "env" | "none";
+  /** Whether a valid source is configured. */
+  repo_configured: boolean;
   /** The raw Settings value ("" when unset). */
   repo_setting: string;
   /** Name of the environment variable used when the Settings value is empty. */

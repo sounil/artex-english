@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // Action validation error of validateTaskInterceptRuleReq. The callers of this validator and buildTaskInterceptRules

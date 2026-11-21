@@ -2,7 +2,7 @@ name: web
 # Runs the static export build of the web UI (web/) on every push and PR to catch frontend regressions
 # before merge. The release workflow (release.yml) builds web only on tags (v*), and this fork had no
 # tag push history so it had never run; this workflow therefore verifies everyday web
-# changes (TypeScript, React, i18n, next-intl). Go
+# changes (TypeScript, React, next-intl string catalog). Go
 # builds and tests are handled by ci.yml, so this runs only when web/ changes (paths filter).
 on:
   push:
@@ -43,16 +43,12 @@ jobs:
       - name: npm ci
         run: npm ci
       - name: Unit tests (merge gate, vitest)
-        # Catches regressions in pure logic (getInitials/formatCurrency, i18n config, statusMeta) and i18n key consistency before merge.
+        # Catches regressions in pure logic (getInitials/formatCurrency, statusMeta, built-in label mapping) before merge.
         run: npm run test -- --run
-      - name: i18n locale key consistency (merge gate, 5 locales match the ko baseline)
-        # Checks that the key sets of en/zh/es/ja are exactly the same as ko.json (both missing and extra keys fail).
-        run: npm run check:i18n
       - name: build:static (merge gate, includes type checking)
         run: npm run build:static
-      - name: UI Han leak guard (merge gate, zero Chinese in out HTML)
-        # A core achievement of this fork is that "no Chinese appears on user-facing screens".
-        # Blocks regressions where a contributor hard-codes Chinese or a translation goes missing, before merge.
+      - name: UI CJK leak guard (merge gate, English-only out HTML)
+        # The UI is English only: fails if Chinese, Korean or Japanese characters appear in the exported HTML.
         # The script finds web/out under the git root by itself, so it does not depend on the working directory.
         run: python3 -I ../scripts/check-web-cjk.py
       - name: biome check (merge gate, keep lint, format and a11y errors at 0)

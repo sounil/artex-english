@@ -6,10 +6,10 @@ import (
 	"errors"
 	"testing"
 
-	actool "github.com/Autumn-27/artex/norma/tool"
+	actool "artex/norma/tool"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
+	"artex/agent"
+	"artex/db"
 )
 
 type recordingToolUsage struct {

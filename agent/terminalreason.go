@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Autumn-27/artex/llmrec"
-	"github.com/Autumn-27/artex/norma/harness"
+	"artex/llmrec"
+	"artex/norma/harness"
 )
 
 // runTrace retains the latest tool call so an interrupted run can identify the

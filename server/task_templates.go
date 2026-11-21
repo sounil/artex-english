@@ -9,7 +9,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 const maxTaskTemplateRequestBytes = 512 << 10
@@ -85,7 +85,7 @@ func validateTaskTemplateRequest(req taskTemplateRequest) error {
 			value = strings.Join(strings.Fields(value), " ")
 		}
 		if utf8.RuneCountInString(value) > check.limit {
-			return fmt.Errorf(trMsg(errTaskTemplateFieldTooLongFmt), check.name, check.limit)
+			return fmt.Errorf(errTaskTemplateFieldTooLongFmt, check.name, check.limit)
 		}
 	}
 	return nil

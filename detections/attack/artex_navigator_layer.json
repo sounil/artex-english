@@ -130,8 +130,8 @@
     ],
     "metadata": [
         {
-            "name": "repository",
-            "value": "https://github.com/jiwoochris/artex-global"
+            "name": "guide",
+            "value": "docs/defense-en.md"
         },
         {
             "name": "rules",

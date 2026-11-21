@@ -1,14 +1,11 @@
 # Contributing
 
-[한국어](CONTRIBUTING.ko.md) · English
-
-Thank you for your interest in the global edition of ARTEX (`artex-global`). This document
+Thank you for your interest in ARTEX. This document
 gathers the scope, policies, and procedures you should know before you start contributing.
 Before you send a contribution, please read [Authorized use and legal responsibility](#authorized-use-and-legal-responsibility)
-and [Localization policy](#localization-policy) first.
+and [English-only policy](#english-only-policy) first.
 
-- To report a bug or suggest a feature → use the [issue templates](https://github.com/jiwoochris/artex-global/issues/new/choose).
-- If you find a translation or localization error → use the "translation/localization error" issue template.
+- To report a bug or suggest a feature → use this repository's issue templates (Issues → New issue).
 - If you find a security vulnerability → **do not open a public issue**; follow the procedure in [SECURITY.md](SECURITY.md).
 - Everyone who takes part must follow the [Code of Conduct (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md).
 
@@ -35,59 +32,40 @@ user who runs it. This repository is provided "AS IS."
 
 ---
 
-## Localization policy
+## English-only policy
 
-This repository adapts [Autumn-27/ARTEX](https://github.com/Autumn-27/ARTEX) (currently
-unreachable, checked 2026-10) for users worldwide. **English is the source language**, and every
-other language is a translation that lives in a localization file. Contributions that put
-non-English text anywhere else are not accepted unless they fall under the exceptions below.
+This code adapts `Autumn-27/ARTEX` (currently unreachable,
+checked 2026-10). **The application and its documentation are English only.** There is no language
+setting and there are no translation files.
 
-- **Write everything outside localization files in English.** This covers code comments, log
-  messages, error strings, agent system prompts and tool descriptions (`agent/promptcatalog.go`
-  and related files), DB seed data (for example `[Built-in] ...` rule names), notification
-  text, and report/CSV exports. Server console logs are always English, whatever the display
-  language.
-- **Translations live only in localization files.** These are the UI messages in
-  `web/messages/{en,ko,zh,es,ja}.json`; in-code translation tables keyed by the English source
-  (`server/errmsg_catalog.go`, `intercept/label_i18n.go`, the severity/status labels in
-  `notify/`); and translated docs (`README.{ko,zh,ja,es}.md`, `*.ko.md`, `docs/*-ko.md`,
-  `*-zh.md`, `CHANGELOG.zh.md`). When you add a user-facing string, write it in English, then
-  add a key to every message file or an entry to the matching table. Do not hard-code
-  translated text. The default and fallback language is English everywhere.
-- **CJK text outside localization files is limited to these deliberate exceptions:**
-  - legacy aliases that keep old stored data readable (for example the `[模型]` model-verdict
-    prefix, now written as `[model]`, Chinese chat-mention tokens such as `@[漏洞#12]`, now
-    written as `@[finding#12]`, old default titles, and old trigger words such as
-    意图/提示/의도/힌트 that are still accepted as input; legacy `[内置] ...` rule names are
-    still recognized);
-  - functional matchers (provider quota error texts, ICP 备案 detection, CJK test inputs);
-  - language autonyms;
-  - the guard marker `【ARTEX 平台管控·非目标防御】` in `guard/guard.go`. The published detection
-    rules in `detections/` match it byte for byte, so it must not change.
-- **The agent output language is selected by a code-fixed directive.** Detection findings
-  (`report_finding`), fact summaries (`record_fact`), the final report, and chat responses are
-  written in the selected language (English by default). The `langDirective()` tail in
-  `agent/prompt.go` (with `agent/outputlang.go`) is appended to each role's system prompt; its
-  instruction body is English. To change how the output language is enforced, modify it there.
-- **The prompts are English now and have not been re-benchmarked yet.** The agent prompts
-  were originally benchmarked in Chinese. The English versions have not been re-benchmarked,
-  so treat changes to prompt wording as behavior changes and verify them against a local
-  isolated sandbox. Existing installs keep the prompts already stored in their database
-  (`agent_prompts` is seeded only when it is empty), so they keep the old Chinese text.
-  Untouched built-in tool descriptions are migrated to English once at
-  startup (`server/tool_desc_legacy.go`).
-- **Commands, payloads, code, URLs, and raw tool output are not translated.** They are the
-  originals needed for analysis, so they are left as is.
-- **The output-language enforcement is a prompt nudge, not a hard cap.** `langDirective()`
-  **instructs** the model to use the selected language; it does not lock the language. Output
-  fidelity therefore varies with the model's capability, the role, and the context. Use a
-  capable (frontier-class) model when you verify localization changes. Cheap or small models
-  can drift into another language, so do not judge whether a translation works from a cheap
-  model's output alone. The `max_tokens` pitfall when using OpenAI-family models is covered in
-  the [README's "Model selection and output language" section](README.md#model-selection-and-output-language).
-- **The procedure for keeping up with upstream changes is in the maintainer document.** When
-  the original ARTEX is updated, the runbook for applying upstream changes under this policy
-  and for checking translation symmetry and stray CJK is in [MAINTAINING.md](MAINTAINING.md).
+- **Write everything in English**: UI text, code comments, log messages, error strings, agent system
+  prompts and tool descriptions (`agent/promptcatalog.go` and related files), DB seed data (for
+  example `[Built-in] ...` rule names), notification text, report/CSV exports and docs.
+- **UI strings go in `web/messages/en.json`** and are looked up by key with `next-intl`. Do not
+  hard-code screen text in components.
+- **Chinese, Japanese or Korean text is limited to these deliberate exceptions:**
+  - legacy aliases that keep data stored by earlier versions readable and shown in English (for
+    example the `[模型]` model-verdict prefix, now written as `[model]`, Chinese chat-mention tokens
+    such as `@[漏洞#12]`, now written as `@[finding#12]`, old default titles, old trigger words such
+    as 意图/提示/의도/힌트 still accepted as input, and legacy `[内置] ...` rule names);
+  - functional matchers for outside input (provider quota error texts, ICP 备案 detection, a skill's
+    pattern for Chinese login errors in target JavaScript, CJK test inputs);
+  - the guard marker `【ARTEX 平台管控·非目标防御】` in `guard/guard.go`. The published detection rules in
+    `detections/` match it byte for byte, so it must not change.
+- **Agent output is English.** `langDirective()` in `agent/prompt.go` is appended to each role's
+  system prompt and tells the model to write findings, fact summaries, reports and chat replies in
+  English, even when the target or its evidence is in another language. It is a prompt instruction,
+  not a hard guarantee: small or cheap models can drift, so verify with a capable model.
+- **The prompts are English and have not been re-benchmarked yet.** They were originally
+  benchmarked in Chinese, so treat changes to prompt wording as behavior changes and verify them
+  against a local isolated sandbox. Existing installs keep the prompts already stored in their
+  database (`agent_prompts` is seeded only when it is empty). Untouched built-in tool descriptions
+  are migrated to English once at startup (`server/tool_desc_legacy.go`).
+- **Commands, payloads, code, URLs and raw tool output are never rewritten.** They are the originals
+  needed for analysis.
+- **CI enforces it.** `scripts/check-web-cjk.py` fails the web build if any Chinese, Korean or
+  Japanese character reaches the exported UI, and the `*_localized_test.go` tests assert that backend
+  messages are English. The maintainer runbook is in [MAINTAINING.md](MAINTAINING.md).
 
 ---
 
@@ -100,7 +78,6 @@ The design intent of the main features is documented in the design docs under `d
 work on the feature that links vulnerabilities to traffic evidence (the report agent's automatic
 binding, `report_finding`'s `traffic_refs`, and so on), read the
 [vulnerability multi-traffic-evidence design doc](docs/finding-traffic-evidence-en.md) first.
-The original (Chinese) is preserved as `finding-traffic-evidence-zh.md` in the same folder.
 
 ### Required versions
 
@@ -223,24 +200,24 @@ docker compose up -d     # start artex + postgres → http://localhost:8787
 4. **Open a PR.** Follow the [PR template](.github/PULL_REQUEST_TEMPLATE.md) for the title and
    description, and write what you changed, why, and how you verified it. If you changed the UI,
    attach screenshots.
-5. For a user-facing change (feature, localization, documentation, detection rule, and so on),
+5. For a user-facing change (feature, documentation, detection rule, and so on),
    add one line to the `[Unreleased]` section of the [changelog (CHANGELOG.md)](CHANGELOG.md).
    Internal refactoring or test-only changes may be omitted.
 
 ### Commit messages
 
 Follow the convention of the existing commit history. The format is `type(scope): description`,
-and the description is written in English (older history also contains Korean descriptions).
+and the description is written in English.
 
-- `type`: `feat` · `fix` · `docs` · `chore` · `refactor` · `test` · `i18n`, and so on
+- `type`: `feat` · `fix` · `docs` · `chore` · `refactor` · `test`, and so on
 - `scope`: the changed area (`agent` · `web` · `server`, and so on); optional
 
 Examples.
 
 ```
-feat(agent): force user-facing output into the selected language (langDirective)
-docs: write the English README, keep the original as README.zh.md
-i18n(web): translate the dashboard navigation labels
+feat(agent): keep user-facing output in English (langDirective)
+docs: document the update source settings in the README
+fix(web): show a retry button when the task report fails to load
 ```
 
 ---

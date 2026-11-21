@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Thank you for the report. Filling in the fields below helps us reproduce and fix it faster.
-        **Do not use this template for security vulnerabilities. Report them through the private process in [SECURITY.md](https://github.com/jiwoochris/artex-global/blob/main/SECURITY.md).**
+        **Do not use this template for security vulnerabilities. Report them through the private process in `SECURITY.md` at the root of this repository.**
   - type: checkboxes
     id: preflight
     attributes:
@@ -54,7 +54,7 @@ body:
         - Web UI / server (web / server)
         - Install / deploy (Docker / scripts)
         - LLM provider integration
-        - Documentation / translation
+        - Documentation
         - Not sure
     validations:
       required: true

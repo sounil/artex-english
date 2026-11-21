@@ -1,7 +1,5 @@
 # Security Policy
 
-[한국어](SECURITY.ko.md) · English
-
 This document explains how to report security vulnerabilities in the **ARTEX global edition (`artex-global`) code itself**. ARTEX is an offensive-security tool that performs penetration testing, but what this document covers is not the results of attacking something with the tool; it is **vulnerabilities that arise when you operate or deploy this software**.
 
 For example:
@@ -32,7 +30,7 @@ Including the following in your report speeds up triage:
 
 ## Supported scope
 
-This repository is a **multilingual localization of the original ARTEX**, maintained by volunteers. Security fixes are provided against the **latest default branch**. We do not guarantee backports to earlier releases. If a vulnerability belongs to the upstream code regardless of localization, we recommend also reporting it to [Autumn-27/ARTEX](https://github.com/Autumn-27/ARTEX) (currently unreachable, checked 2026-10).
+This repository is an **English-only derivative of the original ARTEX**. Security fixes are provided against the **latest default branch**. We do not guarantee backports to earlier releases. The upstream repositories `Autumn-27/ARTEX` (currently unreachable, checked 2026-10) and `jiwoochris/artex-global` are outside this project's control. Report vulnerabilities here, and do not send vulnerability details to either of them unless you have confirmed who now controls it.
 
 ## Out of scope
 

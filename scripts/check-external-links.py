@@ -7,7 +7,7 @@ flaky, so the merge gate does not handle them). This script is that "separate
 check". External links that the top of the README, the defense guide and the
 detections READMEs point visitors and defenders to (incident reporting channels
 boho.or.kr, privacy.go.kr, pipc.go.kr, fsec.or.kr, CISA KEV, OWASP, SigmaHQ,
-Suricata, MITRE, MISP, the original demo artex-demo.vercel.app, GitHub badges,
+Suricata, MITRE, MISP,
 etc.) stay silently broken when they change, move or shut down; this catches them
 periodically or on demand.
 
@@ -44,7 +44,7 @@ Known exceptions (allowlist)
 If a URL listed in `scripts/external-links-allowlist.txt` comes back DOWN, it is
 classified separately as "ALLOWED" and does not affect the strict exit code. This
 transparently records dead links inherited by upstream-preserved files we do not
-own and cannot fix (e.g. the upstream CHANGELOG.zh.md), so the periodic strict check
+own and cannot fix (e.g. the unreachable upstream repo), so the periodic strict check
 does not stay red forever because of them and turns red **only when a new link
 breaks**.
 

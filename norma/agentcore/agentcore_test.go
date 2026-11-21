@@ -8,10 +8,10 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/permission"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/harness"
+	"artex/norma/llm"
+	"artex/norma/permission"
+	"artex/norma/tool"
 )
 
 func sse(lines ...string) string { return strings.Join(lines, "\n") + "\n" }

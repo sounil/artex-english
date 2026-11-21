@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/permission"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/harness"
+	"artex/norma/llm"
+	"artex/norma/permission"
+	"artex/norma/tool"
 )
 
 // TestBackgroundTaskEndToEnd proves the full Session path: a backgrounded Bash

@@ -15,9 +15,8 @@ services:
     restart: unless-stopped
 
   artex:
-    # Locally built image (see the Dockerfile header for the build steps). To use the published release image
-    # instead, set ARTEX_IMAGE=ghcr.io/jiwoochris/artex-global:latest in .env (the docker job in
-    # .github/workflows/release.yml publishes it for every v* tag).
+    # Locally built image (see the Dockerfile header for the build steps). ARTEX_IMAGE in .env can name another
+    # image, such as one published by your own release workflow; only use an image from a source you control.
     image: ${ARTEX_IMAGE:-artex-global:local}
     depends_on:
       postgres:
@@ -37,10 +36,8 @@ services:
       ARTEX_ADMIN_PASSWORD: ${ARTEX_ADMIN_PASSWORD:-}
       # Browser cross-origin allowlist (comma-separated). The built-in UI is same-origin, so this is usually empty.
       ARTEX_CORS_ORIGINS: ${ARTEX_CORS_ORIGINS:-}
-      # Server-side default output language (en, ko, zh, es, ja). Empty means English. For agent output and error
-      # messages, the settings screen's "Display language" takes precedence; server console logs follow only this value.
-      ARTEX_LANG: ${ARTEX_LANG:-}
-      # GitHub repository (owner/name) one-click updates come from. Empty means sounil/artex-english.
+      # GitHub repository (owner/name) one-click updates come from. No default: empty here and in Settings
+      # means updates are unavailable.
       # Update checks stay off until turned on in Settings, and the Settings "Update source" field overrides this.
       ARTEX_UPDATE_REPO: ${ARTEX_UPDATE_REPO:-}
     ports:

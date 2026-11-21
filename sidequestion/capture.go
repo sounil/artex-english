@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/harness"
+	"artex/norma/llm"
 )
 
 type Parent struct {

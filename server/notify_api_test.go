@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/notify"
+	"artex/db"
+	"artex/notify"
 )
 
 // This file covers the end-to-end behavior of notification push: finding stored →

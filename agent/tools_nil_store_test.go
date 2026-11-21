@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	actool "github.com/Autumn-27/artex/norma/tool"
+	actool "artex/norma/tool"
 )
 
 // The server-level ToolSet behind buildDomainReg carries a nil ExplorationStore,

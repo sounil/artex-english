@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Autumn-27/artex/norma/skill"
-	actool "github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/skill"
+	actool "artex/norma/tool"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
+	"artex/agent"
+	"artex/db"
 )
 
 // maxLedgerSkillName caps the skill name stored for a MISS — that string comes

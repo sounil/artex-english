@@ -17,9 +17,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/norma/permission"
-	actool "github.com/Autumn-27/artex/norma/tool"
+	"artex/db"
+	"artex/norma/permission"
+	actool "artex/norma/tool"
 )
 
 // This file implements the custom tool executor (custom tool design notes). tools rows with system=false are

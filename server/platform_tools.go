@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Autumn-27/artex/db"
-	actool "github.com/Autumn-27/artex/norma/tool"
+	"artex/db"
+	actool "artex/norma/tool"
 )
 
 // Platform operation tools (for the built-in Auto agent): create/update skills, custom tools and MCP servers. All are host tools,

@@ -19,7 +19,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 
 	"github.com/miekg/dns"
 	"github.com/projectdiscovery/dnsx/libs/dnsx"

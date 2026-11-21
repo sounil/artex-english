@@ -6,13 +6,13 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/llmrec"
-	"github.com/Autumn-27/artex/norma/agentcore"
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/sidequestion"
+	"artex/db"
+	"artex/intercept"
+	"artex/llmrec"
+	"artex/norma/agentcore"
+	"artex/norma/harness"
+	"artex/norma/llm"
+	"artex/sidequestion"
 )
 
 // captureRun drives one agent turn-to-completion over Session.Prompt and emits a

@@ -77,7 +77,7 @@ func TestServerMgmtAPIReturnedFormat(t *testing.T) {
 // TestServerMgmtSkillExistsSentinel guards the duplicate-skill message: it must say
 // the skill "already exists" and name the skill. (The web overwrite-confirm flow in
 // web/src/app/(main)/system/skills/page.tsx keys on the 409 status, not this text,
-// because the text follows the display language.)
+// because the text may change.)
 func TestServerMgmtSkillExistsSentinel(t *testing.T) {
 	msg := errMgmtSkillExistsPre + "my-skill" + errMgmtSkillExistsPost
 	assertEnglishError(t, "skillExists", msg)

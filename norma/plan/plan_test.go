@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/permission"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/permission"
+	"artex/norma/tool"
 )
 
 func TestControllerTransitions(t *testing.T) {

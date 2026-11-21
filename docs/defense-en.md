@@ -1,8 +1,6 @@
 # Defending Against and Detecting Autonomous AI Attacks
 
 > This document helps **defenders** understand how an **autonomous AI penetration agent** such as ARTEX operates, so that you can build the capability to **detect and block** such attacks. It is not a guide to carrying out attacks. Use everything here only to protect systems you own or have explicit written authorization to test. Probing or attacking someone else's information and communications network without authorization is itself a crime (see the [security and misuse warning in the top-level README](../README.md)).
->
-> Korean version: **[defense-ko.md](defense-ko.md)**.
 
 An autonomous AI attack tool turns a penetration test — once a manual process a single operator ran by hand — into a 24/7 automated process in which an LLM agent **breaks goals down on its own, executes real tools, and accumulates discoveries**. The adversary a defender faces shifts from "one skilled attacker" to "a swarm of agents that never tire and never rest." This guide sets out what that shift demands of detection and response.
 
@@ -156,8 +154,7 @@ description: |
     signature; tune the count and window to your own baseline. On its own this leg is low signal
     and earns weight only inside the correlation below.
 references:
-    - https://github.com/jiwoochris/artex-global/blob/main/docs/defense-ko.md
-    - https://github.com/jiwoochris/artex-global/blob/main/docs/defense-en.md
+    - docs/defense-en.md
 author: artex-global defense guide (generic template)
 date: 2026-10-07
 tags:
@@ -186,8 +183,7 @@ description: |
     correlation below. Extend the marker list to your own probe corpus and WAF categories; it is
     a coarse proxy for the broader "adapts requests to responses" behaviour the guide describes.
 references:
-    - https://github.com/jiwoochris/artex-global/blob/main/docs/defense-ko.md
-    - https://github.com/jiwoochris/artex-global/blob/main/docs/defense-en.md
+    - docs/defense-en.md
 author: artex-global defense guide (generic template)
 date: 2026-10-07
 tags:
@@ -219,8 +215,7 @@ description: |
     often expose weaker identity-verification endpoints than the main service and belong here
     too. This leg is broad by design and is only meaningful inside the correlation below.
 references:
-    - https://github.com/jiwoochris/artex-global/blob/main/docs/defense-ko.md
-    - https://github.com/jiwoochris/artex-global/blob/main/docs/defense-en.md
+    - docs/defense-en.md
 author: artex-global defense guide (generic template)
 date: 2026-10-07
 tags:
@@ -257,8 +252,7 @@ description: |
     session identifier if you have one) and tune the window to your baseline. If three legs are
     too strict and miss cases, relax to any two of the three.
 references:
-    - https://github.com/jiwoochris/artex-global/blob/main/docs/defense-ko.md
-    - https://github.com/jiwoochris/artex-global/blob/main/docs/defense-en.md
+    - docs/defense-en.md
 author: artex-global defense guide (generic template)
 date: 2026-10-07
 tags:
@@ -381,7 +375,7 @@ To actually file: report a security incident through [Boho Nara](https://www.boh
 
 ## References
 
-- Upstream project: [Autumn-27/ARTEX](https://github.com/Autumn-27/ARTEX) (AGPL-3.0 · currently unreachable, checked 2026-10). This document is the defensive material of its global-edition repository.
+- Upstream project: `Autumn-27/ARTEX` (AGPL-3.0 · currently unreachable, checked 2026-10). This document is the defensive guide for this repository, and the detection rules in `detections/` cite it by its path here.
 - The top-level [README security and misuse warning, scope of use, and legal notice](../README.md).
 - This edition is localized for Korea; where personal data is involved, Korean law (the Network Act and the Personal Information Protection Act) applies. Unauthorized testing is a crime in most jurisdictions regardless — always secure written authorization and an agreed scope first.
 - Standard references for general web-security hardening: [OWASP Top 10](https://owasp.org/www-project-top-ten/), [OWASP ASVS (Application Security Verification Standard)](https://owasp.org/www-project-application-security-verification-standard/), [OWASP API Security Top 10](https://api-security.owasp.org/).

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -26,12 +26,6 @@ func TestMain(m *testing.M) {
 	// background loop itself, so disable it suite-wide for determinism; the
 	// loop's dispatch is covered through direct stepRealtime/stepDigest calls.
 	os.Setenv(notifyBackgroundDisabledEnv, "1")
-	// User-facing output is authored in English (the source language), and the
-	// server suite asserts on that source text, so pin the default output
-	// language to English for the whole test binary (matching production's
-	// config.DefaultLanguage). Tests that need another language set it
-	// explicitly (t.Setenv / the settings table / config.CurrentLanguage).
-	os.Setenv("ARTEX_LANG", "en")
 
 	dsn, _, err := db.DSN()
 	if err != nil {

@@ -37,13 +37,11 @@ this classification exhaustively).
 
 What is allowed and detected
 ----------------------------
-- **Hangul (`가-힣` etc.) is allowed.** The Han and Hangul blocks do not overlap in
-  Unicode, so detecting only the Han blocks lets Hangul through automatically.
-- **Only Han (CJK ideographs) is detected**: unified ideographs plus extension A
-  (`㐀`-`鿿`), compatibility ideographs (`豈`-`﫿`), and extension B and above in the
-  supplementary planes (`𠀀`-). Kana and full-width punctuation are not "Han" and are
-  not targeted by this gate (the range is narrowed to Han to avoid false positives
-  from verbatim code blocks or quoted evidence).
+- **Han, Hangul and kana are all detected.** The UI is English only, so Chinese
+  ideographs (unified, extension A, compatibility, and extension B and above),
+  Korean Hangul (syllables and jamo) and Japanese hiragana/katakana all fail the
+  gate. Full-width punctuation is not targeted, to avoid false positives from
+  verbatim code blocks or quoted evidence.
 
 Intentional Han kept for upstream fidelity
 ------------------------------------------
@@ -63,11 +61,14 @@ import re
 import subprocess
 import sys
 
-# CJK Han blocks only. Hangul (AC00-D7A3), kana and full-width punctuation are not included.
-# Ranges: extension A + unified ideographs (U+3400-U+9FFF = 㐀-鿿), compatibility
-#         ideographs (U+F900-U+FAFF = 豈-﫿), supplementary-plane extension B and above
-#         (U+20000-U+2FFFF).
-HAN = re.compile(r"[㐀-鿿豈-﫿\U00020000-\U0002ffff]")
+# Ranges: Han extension A + unified ideographs (U+3400-U+9FFF), compatibility ideographs
+#         (U+F900-U+FAFF), supplementary-plane extension B and above (U+20000-U+2FFFF),
+#         Hangul syllables (U+AC00-U+D7AF), Hangul jamo (U+1100-U+11FF, U+3130-U+318F),
+#         hiragana and katakana (U+3040-U+30FF). Full-width punctuation is not included.
+HAN = re.compile(
+    "[\u3400-\u9fff\uf900-\ufaff\U00020000-\U0002ffff"
+    "\uac00-\ud7af\u1100-\u11ff\u3130-\u318f\u3040-\u30ff]"
+)
 
 # Han characters deliberately left on screen (e.g. the language switcher's `中文`).
 # Empty for now: with it empty, any Han character fails the gate. When adding an
@@ -116,19 +117,19 @@ def main() -> int:
 
     print(f"Checked {checked} HTML files (target: {out_dir})")
     if offenders:
-        print(f"Chinese (Han) leak in {len(offenders)} file(s): user-facing HTML contains Han characters:")
+        print(f"CJK leak in {len(offenders)} file(s): user-facing HTML contains Chinese, Korean or Japanese characters:")
         for rel, count, kinds in offenders:
             preview = kinds if len(kinds) <= 30 else kinds[:30] + "…"
-            print(f"  out/{rel}: {count} Han characters, distinct: {preview}")
+            print(f"  out/{rel}: {count} CJK characters, distinct: {preview}")
         print(
-            "\nTranslate the text, or if it is intentional Han that must be kept for upstream "
-            "fidelity, add it to ALLOWED_HAN in scripts/check-web-cjk.py along with the reason."
+            "\nWrite the text in English, or if a character must stay, add it to ALLOWED_HAN in "
+            "scripts/check-web-cjk.py along with the reason."
         )
         return 1
     if checked == 0:
         print("Warning: no HTML files were checked; make sure the build ran correctly.")
         return 2
-    print("0 Chinese (Han) leaks: user-facing HTML contains no Han characters.")
+    print("0 CJK leaks: user-facing HTML contains no Chinese, Korean or Japanese characters.")
     return 0
 
 

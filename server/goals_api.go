@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // User-facing error responses of goals_api.go. Commands, request field names (text, vulnclass,

@@ -43,7 +43,7 @@ update_docker(){
   # starts pg automatically if it is not running, and leaves it as is without recreating it if it already is.
   info "pulling the new image (artex only)…"
   if ! docker compose pull artex; then
-    warn "could not pull the image ghcr.io/jiwoochris/artex-global (check that the specified tag is a published release tag and that the network works)"
+    warn "could not pull the image set in ARTEX_IMAGE (check that it names an image you trust and that the network works)"
     die "image update failed. You can also update via \"2) Local update (recompile with go)\""
   fi
   info "recreating and starting (artex migrates the schema automatically on restart)…"

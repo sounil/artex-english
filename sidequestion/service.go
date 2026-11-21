@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // User-facing side-question outputs (English source text).

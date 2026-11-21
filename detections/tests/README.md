@@ -1,7 +1,5 @@
 # ARTEX detection rule tests
 
-English · [한국어](README.ko.md)
-
 Reproducible regression tests that prove the rules under [`../`](../) actually fire — and, just as
 important, stay silent on benign traffic. A detection rule you cannot run is a claim; these tests turn the
 claims in the rule files and the defense guide into something a reviewer can re-run from source.
@@ -273,15 +271,15 @@ documented baseline in [`sigma_lint/validators.yml`](sigma_lint/validators.yml).
 
 - **The documented baseline is clean** — `sigma check` with `validators.yml` reports 0 errors and 0 issues.
 - **The full set is live, and only the documented exclusions remain** — running every SigmaHQ validator with
-  no exclusions still reports issues, and each one is among the four checks `validators.yml` deliberately
+  no exclusions still reports issues, and each one is among the three checks `validators.yml` deliberately
   disables (nothing else). This is the anti-vacuity guard: if the plugin failed to load, the full run would
   report nothing and the first property would pass for the wrong reason, so the known exclusions are required
   to appear.
 
-The four exclusions encode SigmaHQ's monorepo filing scheme (logsource-prefixed and `correlation_` filenames)
-and taxonomy (a generic `application` logsource and a product-less `process_creation`), plus the
-branch-vs-permalink reference convention — none of which fit a small standalone rule set that references its
-own living docs. Each exclusion carries its rationale inline in `validators.yml`. Because every *other*
+The three exclusions encode SigmaHQ's monorepo filing scheme (logsource-prefixed and `correlation_` filenames)
+and taxonomy (a generic `application` logsource and a product-less `process_creation`), neither of which
+fits a small standalone rule set. The rules reference the defense guide by its path in this repository
+(`docs/defense-en.md`), so the GitHub-permalink check is enforced and has nothing to flag. Each exclusion carries its rationale inline in `validators.yml`. Because every *other*
 SigmaHQ check is enforced, a rule that picks up a new convention issue — a mis-cased title, an off-taxonomy
 field name — turns the build red. `pySigma-validators-sigmahq` is pinned (`0.21.0`, override with
 `SIGMAHQ_VALIDATORS_VERSION`); bumping it may surface new conventions, which is the signal to update the rules
@@ -299,7 +297,7 @@ Expected output (abridged):
 
 ```
   PASS  sigma check with the documented baseline: 0 errors, 0 issues
-  PASS  every reported issue is one of the four documented exclusions
+  PASS  every reported issue is one of the three documented exclusions
 RESULT: PASS
 ```
 

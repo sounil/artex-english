@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Autumn-27/artex/norma/permission"
+	"artex/norma/permission"
 )
 
 // Deferred tools: a mechanism to keep a tool callable while withholding its schema
@@ -16,7 +16,7 @@ import (
 // (via RenderDeferredToolsBlock, placed by the host in the cached system prompt).
 // The model discovers a deferred tool's schema with SearchExtraTools, then invokes
 // it with ExecuteExtraTool. Both access tools stay in the model's list (never
-// deferred). See docs/mcp-deferred-tools-方案设计.md.
+// deferred).
 
 // Fixed names of the two always-loaded access tools.
 const (

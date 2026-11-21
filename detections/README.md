@@ -1,9 +1,7 @@
 # ARTEX detection rules
 
-English · [한국어](README.ko.md)
-
 Deployable [Sigma](https://sigmahq.io) rules that formalize the pseudo-rules in the defense guide
-([Korean](../docs/defense-ko.md) · [English](../docs/defense-en.md), section 4) into a vendor-neutral
+([`defense-en.md`](../docs/defense-en.md), section 4) into a vendor-neutral
 format you can convert to your own SIEM or EDR query language. Every indicator here is grounded in a
 string or behaviour verified in this repository's source, not inferred.
 
@@ -157,7 +155,7 @@ The rules ship with reproducible tests in [`tests/`](tests/), each needing only 
 - **SigmaHQ convention lint** ([`tests/sigma_lint/run.sh`](tests/sigma_lint/run.sh)) runs the full SigmaHQ
   validator set (the `pySigma-validators-sigmahq` plugin, which plain `sigma check` does not load) against the
   documented baseline in [`tests/sigma_lint/validators.yml`](tests/sigma_lint/validators.yml) and asserts 0
-  issues. It also checks that the full set actually ran and that only four deliberately excluded, documented
+  issues. It also checks that the full set actually ran and that only three deliberately excluded, documented
   checks remain, so a rule that picks up a new convention issue (a mis-cased title, an off-taxonomy field)
   fails the build.
 

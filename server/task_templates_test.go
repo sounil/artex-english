@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 func TestTaskTemplateHTTPCRUD(t *testing.T) {

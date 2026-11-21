@@ -3,7 +3,7 @@ package agent
 import (
 	"strings"
 
-	"github.com/Autumn-27/artex/norma/harness"
+	"artex/norma/harness"
 )
 
 // Wrap-up (settlement) prompts: when an agent is terminated for [running out of steps (MaxTurns)] or
@@ -93,28 +93,10 @@ func resolveWrapupTurns(agentKey string) int {
 // (reads DB live), so edits apply on the next run without a restart.
 func wrapupSettlement(agentKey string, disabledTools []string) *harness.Settlement {
 	return &harness.Settlement{
-		Prompt:        withWrapupLang(resolveWrapup(agentKey)),
+		Prompt:        resolveWrapup(agentKey),
 		DisabledTools: disabledTools,
 		MaxTurns:      resolveWrapupTurns(agentKey),
 	}
-}
-
-// withWrapupLang appends the output-language directive (langDirective) to a wrap-up prompt.
-// Unlike system prompts, wrap-up prompts don't get the langDirective tail automatically,
-// so it must be appended here for the final user-visible one-sentence summary to follow the chosen display language.
-// The wrap-up prose itself is an operating instruction the model reads (kept in English); this tail, at top priority,
-// only forces the language of user-visible text. It is harmless for the planner family, which outputs no summary.
-// No tail is appended for English: the prose is already English and the system prompt's langDirective
-// already governs the output language, so the default path's model input stays minimal.
-func withWrapupLang(prompt string) string {
-	if strings.TrimSpace(prompt) == "" {
-		return prompt
-	}
-	lang := resolveOutputLang()
-	if lang == "en" {
-		return prompt
-	}
-	return prompt + langDirective(lang)
 }
 
 // ---------- Task-level timeout wrap-up prompts (see the task-level timeout and wrap-up design doc) ----------
@@ -172,7 +154,7 @@ func resolveTaskTimeoutTurns(agentKey string) int {
 //
 // The harness's PromptByReason picks by the [actual] reason at wrap-up time, so there is no build-time mismatch.
 func wrapupSettlementForTask(agentKey string, disabledTools []string, clamped bool) *harness.Settlement {
-	perRun := withWrapupLang(resolveWrapup(agentKey))
+	perRun := resolveWrapup(agentKey)
 	st := &harness.Settlement{
 		Prompt:        perRun, // fallback (also the value for both reasons when not clamped)
 		DisabledTools: disabledTools,
@@ -181,8 +163,8 @@ func wrapupSettlementForTask(agentKey string, disabledTools []string, clamped bo
 	if clamped {
 		if tt := resolveTaskTimeoutWrapup(agentKey); tt != "" {
 			st.PromptByReason = map[harness.TerminalReason]string{
-				harness.ReasonTimeout:  withWrapupLang(tt), // task time is up
-				harness.ReasonMaxTurns: perRun,             // steps ran out first, task still has time
+				harness.ReasonTimeout:  tt,     // task time is up
+				harness.ReasonMaxTurns: perRun, // steps ran out first, task still has time
 			}
 			st.MaxTurns = resolveTaskTimeoutTurns(agentKey)
 		}

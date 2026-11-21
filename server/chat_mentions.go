@@ -10,7 +10,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 const maxChatMentions = 10
@@ -148,7 +148,7 @@ func composeChatMentionMessage(pg *db.DB, message string) (string, error) {
 			if label == "" {
 				label = ref.Name
 			}
-			return "", &chatMentionInputError{fmt.Sprintf(trMsg(errChatMentionNotFoundFmt), label, ref.ID)}
+			return "", &chatMentionInputError{fmt.Sprintf(errChatMentionNotFoundFmt, label, ref.ID)}
 		}
 		blob, err := json.Marshal(data)
 		if err != nil {

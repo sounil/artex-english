@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/db"
+	"artex/intercept"
+	"artex/norma/llm"
 )
 
 type reviewCaptureProvider struct{ request llm.CompletionRequest }

@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	actool "github.com/Autumn-27/artex/norma/tool"
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
+	"artex/agent"
+	"artex/db"
+	actool "artex/norma/tool"
 )
 
 // hasSkillTool reports whether the packed tool set contains the Skill meta-tool.

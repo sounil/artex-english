@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // These tests were added when GET /api/intercept/judge/usage was brought back into

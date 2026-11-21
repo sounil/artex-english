@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/traffic"
+	"artex/db"
+	"artex/traffic"
 )
 
 func evidenceFixture(t *testing.T) (*Store, db.RecordFindingInput, string) {

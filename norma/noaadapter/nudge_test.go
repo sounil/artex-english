@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/agentcore"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/noa"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/agentcore"
+	"artex/norma/llm"
+	"artex/norma/noa"
+	"artex/norma/tool"
 )
 
 // pressureSession builds a session whose view is large enough to sit in the

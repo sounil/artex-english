@@ -8,31 +8,5 @@
 #
 # Format: one URL per line. Text after `#` is a comment; blank and comment-only lines are ignored.
 
-# Contributor GitHub profile credited by upstream (Autumn-27/ARTEX) CHANGELOG.zh.md:539.
-# The account was renamed or deleted, so it returns 404. Under the upstream-preservation
-# policy (BRIEF boundary #1, MAINTAINING section 2), CHANGELOG.zh.md stays exactly as
-# upstream wrote it, so we do not fix it. Confirmed 2026-10-07.
-https://github.com/begininvoke
-
-# Upstream (Autumn-27/ARTEX) repo, online demo and release/compare assets are not publicly
-# accessible (404), confirmed 2026-10. The URLs below are upstream assets this fork points
-# to as its base and for credit; as of 2026-10 all of them return 404. AGPL-3.0 attribution
-# must be kept (BRIEF boundary #1), so the links themselves are not removed; curated docs
-# (README, CONTRIBUTING, MAINTAINING, SECURITY, docs/defense) annotate each link with
-# "(currently unreachable, confirmed 2026-10)" (G138a decision A). These are upstream-owned
-# assets we cannot revive, so they stay on the allowlist. The compare and releases links are
-# inherited by upstream-preserved files (CHANGELOG.zh.md, README.zh.md) and kept verbatim.
-https://artex-demo.vercel.app/
-https://github.com/Autumn-27/ARTEX
-https://github.com/Autumn-27/norma
-https://github.com/Autumn-27/ARTEX/releases
-https://github.com/Autumn-27/ARTEX/compare/v0.3.1...v0.3.2
-https://github.com/Autumn-27/ARTEX/compare/v0.3.2...v0.3.3
-https://github.com/Autumn-27/ARTEX/compare/v0.3.3...v0.3.4
-https://github.com/Autumn-27/ARTEX/compare/v0.3.4...v0.3.5
-https://github.com/Autumn-27/ARTEX/compare/v0.3.5...v0.3.6
-https://github.com/Autumn-27/ARTEX/compare/v0.3.6...v0.3.7
-https://github.com/Autumn-27/ARTEX/compare/v0.3.7...v0.3.8
-https://github.com/Autumn-27/ARTEX/compare/v0.3.8...v0.3.9
-https://github.com/Autumn-27/ARTEX/compare/v0.3.9...v0.3.10
-https://github.com/Autumn-27/ARTEX/compare/v0.3.10...HEAD
+# (No entries. Upstream repositories are named in the docs as plain text, not links, so
+# nothing outside this project's control is linked from them.)

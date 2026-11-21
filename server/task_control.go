@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Autumn-27/artex/agent"
-	"github.com/Autumn-27/artex/db"
+	"artex/agent"
+	"artex/db"
 )
 
 const maxBatchControlIDs = 100
@@ -278,7 +278,7 @@ func (s *Server) controlTasksBatch(w http.ResponseWriter, r *http.Request) {
 	}
 	taskIDs := normalizeBatchTaskIDs(req.TaskIDs)
 	if len(taskIDs) == 0 || len(taskIDs) > maxBatchControlIDs {
-		writeErr(w, 400, fmt.Sprintf(trMsg(errTaskCtrlBatchSizeFmt), maxBatchControlIDs))
+		writeErr(w, 400, fmt.Sprintf(errTaskCtrlBatchSizeFmt, maxBatchControlIDs))
 		return
 	}
 	items := make([]batchControlItem, 0, len(taskIDs))

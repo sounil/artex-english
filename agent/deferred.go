@@ -3,8 +3,8 @@ package agent
 import (
 	"encoding/json"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	actool "github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/llm"
+	actool "artex/norma/tool"
 )
 
 // deferredSystem builds an agent's system-prompt segments and cache boundary from

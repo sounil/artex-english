@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/llm"
+	"artex/norma/tool"
 )
 
 // The global post-tool net caps an oversized text block regardless of the tool.

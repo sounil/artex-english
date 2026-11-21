@@ -1,6 +1,6 @@
 <!--
   This PR template is specific to artex-global (the ARTEX global edition).
-  Please read CONTRIBUTING.md first for the contribution and localization policies.
+  Please read CONTRIBUTING.md first for the contribution and English-only policies.
 -->
 
 ## Summary
@@ -14,7 +14,6 @@
 - [ ] Bug fix (`fix`)
 - [ ] New feature (`feat`)
 - [ ] Documentation (`docs`)
-- [ ] Localization / translation (`i18n`)
 - [ ] Refactoring / cleanup (`refactor` / `chore`)
 - [ ] Other:
 
@@ -30,15 +29,12 @@
 - [ ] web changes: `npm run check` · `npm run build` pass
 - [ ] UI changes: screenshots attached
 
-## Localization checklist
+## English-only checklist
 
-<!-- You may leave this section empty if the PR is unrelated to localization. -->
-
-- [ ] New comments, logs, error strings, prompts, and tool descriptions are in English; translations live only in localization files (`web/messages/*.json`, the English-keyed tables such as `server/errmsg_catalog.go`, translated docs).
-- [ ] Any CJK I added outside localization files is an allowed exception (legacy alias, functional matcher, language autonym, guard marker) per [CONTRIBUTING.md](../CONTRIBUTING.md#localization-policy).
-- [ ] I did not hard-code UI strings; I added each key to every `web/messages/*.json` file, with `en.json` as the source.
-- [ ] If I changed agent prompt wording (`agent/promptcatalog.go` · `agent_prompts`), I checked the agent's behavior in a local isolated environment (the English prompts are not yet re-benchmarked).
-- [ ] I left commands, payloads, code, URLs, and raw tool output untranslated.
+- [ ] New UI text, comments, logs, error strings, prompts, tool descriptions and docs are in English. UI strings go in `web/messages/en.json`, not hard-coded.
+- [ ] Any Chinese, Japanese or Korean I added is an allowed exception (legacy alias for old stored data, functional matcher, guard marker) per [CONTRIBUTING.md](../CONTRIBUTING.md#english-only-policy).
+- [ ] If I changed agent prompt wording (`agent/promptcatalog.go` · `agent_prompts`), I checked the agent's behavior in a local isolated environment.
+- [ ] I left commands, payloads, code, URLs, and raw tool output unchanged.
 
 ## Authorized-use confirmation
 

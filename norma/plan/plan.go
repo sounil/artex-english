@@ -11,8 +11,8 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/Autumn-27/artex/norma/permission"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/permission"
+	"artex/norma/tool"
 )
 
 // Approver is the host's plan-approval callback (a CLI prompt, a GUI, or an

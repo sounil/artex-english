@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
+	"artex/db"
 )
 
 // User-facing intercept verdict and approval messages. Judge verdicts and rule
@@ -516,10 +516,7 @@ func (i *Interceptor) Judge(ctx context.Context, tool string, arguments json.Raw
 }
 
 func judgeActionLabel(action string) string {
-	if v, ok := judgeActionLabels[judgeActionLang()][action]; ok {
-		return v
-	}
-	if v, ok := judgeActionLabels["en"][action]; ok {
+	if v, ok := judgeActionLabels[action]; ok {
 		return v
 	}
 	return action

@@ -11,11 +11,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/permission"
-	"github.com/Autumn-27/artex/norma/subagent"
-	"github.com/Autumn-27/artex/norma/tool"
+	"artex/norma/harness"
+	"artex/norma/llm"
+	"artex/norma/permission"
+	"artex/norma/subagent"
+	"artex/norma/tool"
 )
 
 // DefaultWorkerPrompt is the default system prompt for worker subagents.

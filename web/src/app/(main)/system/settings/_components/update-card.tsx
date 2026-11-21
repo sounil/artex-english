@@ -250,11 +250,13 @@ export function UpdateCard() {
           />
         </div>
         <p id="update-check-enabled-description" className="text-xs text-muted-foreground">
-          {t.rich("update.source", {
-            ...richTags,
-            repo: info?.repo || "…",
-            env: info?.repo_env || "ARTEX_UPDATE_REPO",
-          })}
+          {info && !info.repo
+            ? t.rich("update.sourceNone", { ...richTags, env: info.repo_env || "ARTEX_UPDATE_REPO" })
+            : t.rich("update.source", { ...richTags, repo: info?.repo || "…" })}
+        </p>
+        <p className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-400">
+          <TriangleAlertIcon className="mt-0.5 size-3.5 shrink-0" />
+          <span>{t.rich("update.sourcePrecaution", richTags)}</span>
         </p>
         {info && !enabled && <p className="text-xs text-muted-foreground">{t("update.disabledNote")}</p>}
 
@@ -288,7 +290,6 @@ export function UpdateCard() {
             {t.rich("update.sourceHelp", {
               ...richTags,
               env: info?.repo_env || "ARTEX_UPDATE_REPO",
-              default: "sounil/artex-english",
             })}
           </p>
         </form>

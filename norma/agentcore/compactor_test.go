@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/compaction"
-	"github.com/Autumn-27/artex/norma/harness"
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/compaction"
+	"artex/norma/harness"
+	"artex/norma/llm"
 )
 
 type stubCompactor struct{}

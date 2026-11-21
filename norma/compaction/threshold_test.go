@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // raw builds a Compactor with the given cfg WITHOUT New's defaulting, so tests

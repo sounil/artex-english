@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
+	"artex/norma/llm"
 )
 
 // noopCompactor implements Compactor but NOT ContextView: the loop must fall

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Autumn-27/artex/norma/llm"
-	"github.com/Autumn-27/artex/norma/noa"
+	"artex/norma/llm"
+	"artex/norma/noa"
 )
 
 // Compression may rewrite a tool call's arguments. Gemini's thought_signature
