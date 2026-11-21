@@ -1,0 +1,60 @@
+name: web
+# Runs the static export build of the web UI (web/) on every push and PR to catch frontend regressions
+# before merge. The release workflow (release.yml) builds web only on tags (v*), and this fork had no
+# tag push history so it had never run; this workflow therefore verifies everyday web
+# changes (TypeScript, React, i18n, next-intl). Go
+# builds and tests are handled by ci.yml, so this runs only when web/ changes (paths filter).
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "web/**"
+      - ".github/workflows/web.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - ".github/workflows/web.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  # The static export build is a merge gate. `NEXT_EXPORT=1 next build` has no
+  # typescript.ignoreBuildErrors setting in next.config, so it also runs TypeScript type checking;
+  # a type error or export failure stops this job red and blocks the merge.
+  #
+  # The biome lint is also a merge gate. After the pre-existing lint debt inherited from upstream (G7) was cleared to 0
+  # (errors 8→0: skills tree a11y 6 + package.json formatter 1 + logo.svg noSvgWithoutTitle 1),
+  # the informational step was promoted to a gate. Now if `npm run check` (biome check) reports an error, this
+  # job stops red and blocks the merge, preventing regressions that dirty the cleaned-up state again.
+  # Warnings and info do not affect the exit code (biome is non-zero only at error level), so they do not block merges.
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: npm ci
+        run: npm ci
+      - name: Unit tests (merge gate, vitest)
+        # Catches regressions in pure logic (getInitials/formatCurrency, i18n config, statusMeta) and i18n key consistency before merge.
+        run: npm run test -- --run
+      - name: i18n locale key consistency (merge gate, 5 locales match the ko baseline)
+        # Checks that the key sets of en/zh/es/ja are exactly the same as ko.json (both missing and extra keys fail).
+        run: npm run check:i18n
+      - name: build:static (merge gate, includes type checking)
+        run: npm run build:static
+      - name: UI Han leak guard (merge gate, zero Chinese in out HTML)
+        # A core achievement of this fork is that "no Chinese appears on user-facing screens".
+        # Blocks regressions where a contributor hard-codes Chinese or a translation goes missing, before merge.
+        # The script finds web/out under the git root by itself, so it does not depend on the working directory.
+        run: python3 -I ../scripts/check-web-cjk.py
+      - name: biome check (merge gate, keep lint, format and a11y errors at 0)
+        if: always()
+        run: npm run check

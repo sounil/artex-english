@@ -1,0 +1,36 @@
+name: external-links
+# Checks that external links referenced by tracked Markdown (the defense guide's incident reporting channels boho.or.kr,
+# privacy.go.kr, pipc.go.kr, fsec.or.kr, CISA KEV, OWASP, SigmaHQ, Suricata, MITRE, MISP, the original demo, GitHub
+# badges, etc.) are still alive. External URL liveness depends on the network and remote server policies
+# and is flaky, so the internal-link merge gate (docs.yml) does not check it. This workflow therefore
+# runs only on a weekly schedule and manual dispatch (workflow_dispatch), not on push/PR, so it **never blocks merges**;
+# when an external link changes or shuts down, the periodic run turns red. Internal links and anchors are docs.yml, Go build,
+# analysis and tests are ci.yml, detection rules are detections.yml, and the web UI build is web.yml.
+#
+# --strict fails only when there is at least one DOWN (404, 410, 5xx,
+# DNS/connection error) not on the allowlist (scripts/external-links-allowlist.txt). RESTRICTED (host alive but
+# bot blocking, rate limiting, etc.) and ALLOWED (dead links inherited from upstream that we cannot fix) do not count as failures,
+# so a red run means "an external link curated by our docs has newly broken; go look". Scheduled
+# workflows run only on the default branch (main).
+on:
+  schedule:
+    - cron: "17 0 * * 1" # every Monday 00:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-links-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      # python3 is preinstalled on the ubuntu-latest runner and the script uses only the standard library,
+      # so nothing needs installing. -I runs it isolated from the user site and environment.
+      - name: External link liveness check (browser UA, GET, follow redirects, allowlist excluded, non-blocking)
+        run: python3 -I scripts/check-external-links.py --strict

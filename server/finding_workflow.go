@@ -1,0 +1,193 @@
+package server
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
+	"strconv"
+
+	"github.com/Autumn-27/artex/agent"
+	"github.com/Autumn-27/artex/db"
+	actool "github.com/Autumn-27/artex/norma/tool"
+	"github.com/Autumn-27/artex/traffic"
+)
+
+// Agent-facing strings: everything in this file feeds the agent and never goes out as an
+// HTTP user response (there is no writeErr here).
+// The sinks are (referenced by symbol rather than line number so edits do not invalidate them):
+//
+//	(1) Tool descriptions and schema descriptions: report_finding's evidence_hint_id and hints.text,
+//	    bind_finding_traffic's wrTool description and finding_id strParam. Tool definitions read by the
+//	    LLM.
+//	(2) Migration match strings: the legacy variables in seedFindingWorkflowTools (the old traffic_search
+//	    description) is the comparison value of the UPDATE ... WHERE description=$2 that upgrades it to
+//	    traffic.TrafficSearchDescription (now English), also matching the previous Chinese default.
+//	    They must stay byte-identical to the old seeded rows or the upgrade stops matching.
+//	(3) actool.Errorf tool results: agentFindingTrafficAccess's errors are wrapped by its only callers,
+//	    toolBindFindingTraffic (this file) and get_finding_traffic (finding_traffic.go), with
+//	    actool.Errorf(err.Error()) and returned to the agent; toolBindFindingTraffic's binding-disabled
+//	    and empty traffic_refs messages are direct actool.Errorf calls.
+func (s *Server) seedFindingWorkflowTools() {
+	// v4: also rewrites rows still holding the previous (Chinese) default text to the
+	// current English default. Bumped from v3 so databases that already ran v3 run it again;
+	// the update only matches unmodified built-in text, so re-running is idempotent.
+	const hostSearchDescriptionFlag = "finding_workflow_tools_v4_host_search_description"
+	if value, _, _ := s.m.pg.GetSetting(hostSearchDescriptionFlag); value != "true" {
+		// Only replace the original built-in text. A user-edited description is
+		// authoritative and must survive upgrades.
+		// legacy: byte-identical copies of earlier seeded Chinese traffic_search descriptions, used only to match unmodified rows.
+		legacy := "查询记录代理已抓取的目标流量（必须指定 host，可再按 URL 子串或正文关键词过滤）。body_contains 会在已抓取的请求/响应头与正文中做全文搜索，支持任意子串和中文（至少 3 个字符），可用来找响应里的密码、密钥、报错、内网地址等。仅返回极轻量索引(id/method/url/status/resp_len)，不含任何响应内容。默认只返回 3 条、每页最多 10 条；结果多时用 page 翻页（page=0 起）；要看某条的请求/响应原文用 traffic_get(id)。回看已访问资源、找端点先用它，避免重复 curl 同一 URL。"
+		// legacy: the previous default (host:port aware) before the description became English.
+		legacyHostPort := "查询记录代理已抓取的目标流量（必须指定 host；支持裸主机、主机:端口或完整 URL，可再按 URL 子串或正文关键词过滤）。指定端口时只返回该服务的流量，避免同一 IP 的不同端口串包。body_contains 会在已抓取的请求/响应头与正文中做全文搜索，支持任意子串和中文（至少 3 个字符）。仅返回极轻量索引(id/method/url/status/resp_len)，不含响应内容；结果非空后必须用 traffic_get 逐条核实请求/响应，再把确实支持当前漏洞的 ID 交给 bind_finding_traffic。默认只返回 3 条、每页最多 10 条；结果多时用 page 翻页。"
+		if _, err := s.m.pg.Exec(`UPDATE tools SET description=$1,updated_at=now() WHERE key='traffic_search' AND system AND (description=$2 OR description=$3)`, traffic.TrafficSearchDescription, legacy, legacyHostPort); err != nil {
+			// Log and leave the flag unset so the next startup retries; do not
+			// return, or a transient error here would also skip the reporter
+			// migration below — the two are independent.
+			log.Printf("[evidence] upgrade traffic_search description: %v", err)
+		} else {
+			_ = s.m.pg.SetSetting(hostSearchDescriptionFlag, "true")
+		}
+	}
+	const flag = "finding_workflow_tools_v2_reporter"
+	if value, _, _ := s.m.pg.GetSetting(flag); value == "true" {
+		return
+	}
+	for _, key := range []string{"report_finding", "add_hint", "add_task_hint"} {
+		row, err := s.m.pg.GetTool(key)
+		if err != nil {
+			log.Printf("[evidence] load %s: %v", key, err)
+			return
+		}
+		if row == nil || !row.System {
+			continue
+		}
+		var schema map[string]any
+		if err := json.Unmarshal(row.Schema, &schema); err != nil {
+			log.Printf("[evidence] invalid schema for %s: %v", key, err)
+			return
+		}
+		if schema == nil {
+			log.Printf("[evidence] missing object schema for %s", key)
+			return
+		}
+		props := objectProperty(schema, "properties")
+		if key == "report_finding" {
+			if _, exists := props["evidence_hint_id"]; !exists {
+				props["evidence_hint_id"] = map[string]any{"type": "integer", "description": "Optional: the hint ID in this task corresponding to this vulnerability; the traffic_refs saved on that hint are bound too. Omit when there is no hint"}
+			}
+		} else {
+			if _, exists := props["traffic_refs"]; !exists {
+				props["traffic_refs"] = agent.HintTrafficSchema()
+			}
+			hints := objectProperty(props, "hints")
+			if _, exists := hints["type"]; !exists {
+				hints["type"] = "array"
+			}
+			items := objectProperty(hints, "items")
+			if _, ok := items["type"]; !ok {
+				items["type"] = "object"
+			}
+			itemProps := objectProperty(items, "properties")
+			for name, value := range map[string]any{"text": strParam("Hint content"), "asset_ids": map[string]any{"type": "array", "items": map[string]any{"type": "integer"}}, "traffic_refs": agent.HintTrafficSchema()} {
+				if _, exists := itemProps[name]; !exists {
+					itemProps[name] = value
+				}
+			}
+		}
+		raw, _ := json.Marshal(schema)
+		result, err := s.m.pg.Exec(`UPDATE tools SET schema=$2::jsonb,updated_at=now() WHERE key=$1 AND system AND schema=$3::jsonb`, key, string(raw), string(row.Schema))
+		if err != nil {
+			log.Printf("[evidence] upgrade %s: %v", key, err)
+			return
+		}
+		if n, _ := result.RowsAffected(); n != 1 {
+			return
+		} // preserve concurrent user edits
+	}
+	// Upgrade only the original default binding. Customized lists and enabled
+	// flags survive; the one-time flag also preserves future user unbinding.
+	readers := `["worker","reporter"]`
+	for _, key := range []string{"traffic_search", "traffic_get", "traffic_blob"} {
+		if _, err := s.m.pg.Exec(`UPDATE tools SET agents=$2::jsonb WHERE key=$1 AND system AND (agents='["worker"]'::jsonb OR (agents @> '["worker","planner","mainagent","auto","pentest"]'::jsonb AND jsonb_array_length(agents)=5))`, key, readers); err != nil {
+			return
+		}
+	}
+	if _, err := s.m.pg.Exec(`UPDATE tools SET agents=$1::jsonb WHERE key='get_finding_traffic' AND system AND agents @> '["auto","reporter"]'::jsonb AND jsonb_array_length(agents)=2`, `["auto","reporter","worker","planner","mainagent","pentest"]`); err != nil {
+		return
+	}
+	// Replace the previous code default only; preserve customized binding lists.
+	if _, err := s.m.pg.Exec(`UPDATE tools SET agents='["reporter"]'::jsonb WHERE key='bind_finding_traffic' AND system AND agents @> '["worker","planner","mainagent","auto","pentest"]'::jsonb AND jsonb_array_length(agents)=5`); err != nil {
+		return
+	}
+	if err := s.m.pg.AddAgentToToolBinding("reporter", []string{"bind_finding_traffic"}); err != nil {
+		return
+	}
+	_ = s.m.pg.SetSetting(flag, "true")
+}
+
+func objectProperty(parent map[string]any, key string) map[string]any {
+	value, ok := parent[key].(map[string]any)
+	if !ok {
+		value = map[string]any{}
+		parent[key] = value
+	}
+	return value
+}
+
+func (s *Server) agentFindingTrafficAccess(ctx context.Context, id int64, write bool) error {
+	if id <= 0 {
+		return errors.New("finding_id must be a standalone vulnerability record ID, not an exploration node ID")
+	}
+	f, err := s.m.pg.GetFinding(id)
+	if err != nil {
+		return err
+	}
+	if f == nil {
+		return fmt.Errorf("%w: finding_id=%d. Evidence tools use the standalone vulnerability record ID; read it from the finding_id field of list_task_findings / get_task_node_detail; do not pass id / finding_node_id", db.ErrFindingNotFound, id)
+	}
+	if ri := agent.RunInfoFrom(ctx); ri.TaskID > 0 {
+		task := s.m.ResolveTask(strconv.FormatInt(ri.TaskID, 10))
+		if task == nil {
+			return errors.New("task not found")
+		}
+		_, inherited, allowed := findingProvenanceInTask(task, f.TaskID)
+		if !allowed {
+			return errors.New("this vulnerability cannot be read from the current task")
+		}
+		if write && inherited {
+			return errors.New("traffic evidence of an inherited vulnerability is read-only; modify it in the source task")
+		}
+	}
+	return nil
+}
+
+func (s *Server) toolBindFindingTraffic() actool.CoreTool {
+	return wrTool("bind_finding_traffic", "Bind verified real HTTP traffic to an already recorded vulnerability. finding_id is the standalone vulnerability record ID; do not pass an exploration node ID. All references in a batch succeed or fail together; duplicate references do not overwrite existing notes. Binding marks any existing report as needing an update; do not re-probe or create duplicate vulnerabilities just to capture packets.",
+		objSchema(map[string]any{"finding_id": strParam("Standalone vulnerability record ID, read from the finding_id field of list_task_findings / get_task_node_detail"), "traffic_refs": agent.HintTrafficSchema()}, "finding_id", "traffic_refs"),
+		func(ctx context.Context, raw json.RawMessage) (actool.Result, error) {
+			if !s.m.pg.GetBool(settingAgentTrafficBinding, false) {
+				return actool.Errorf("Automatic traffic binding by agents is disabled; enable it in system settings, or bind manually on the page."), nil
+			}
+			var args struct {
+				FindingID json.RawMessage `json:"finding_id"`
+				Refs      []db.TrafficRef `json:"traffic_refs"`
+			}
+			if err := json.Unmarshal(raw, &args); err != nil {
+				return actool.Errorf(err.Error()), nil
+			}
+			id := parseProfileID(args.FindingID)
+			if err := s.agentFindingTrafficAccess(ctx, id, true); err != nil {
+				return actool.Errorf(err.Error()), nil
+			}
+			if len(args.Refs) == 0 {
+				return actool.Errorf("Binding requires at least one verified traffic_refs entry; there is no need to call this tool without traffic"), nil
+			}
+			list, err := s.evidenceStore().Bind(ctx, id, args.Refs)
+			if err != nil {
+				return actool.Errorf(err.Error()), nil
+			}
+			return jsonResult(trafficSummary(list))
+		})
+}
